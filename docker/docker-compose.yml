@@ -1,0 +1,18 @@
+version: '3'
+services:
+  mysql:
+    container_name: bgp3-mysql
+    ports:
+     - "192.168.1.101:3306:3306"
+    image: "bgp_mysql"
+    privileged: true
+    restart: unless-stopped
+
+  dashboard:
+    container_name: bgp3-board
+    ports:
+     - "192.168.1.101:80:80"
+     - "192.168.1.101:443:443"
+    image: "bgp_dash"
+    privileged: true
+    restart: unless-stopped

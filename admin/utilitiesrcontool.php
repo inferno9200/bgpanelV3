@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -33,14 +33,11 @@ $tab = 4;
 $return = 'utilitiesrcontool.php';
 
 
-require("../configuration.php");
-require("./include.php");
+require("configuration.php");
+require("include.php");
 
 
 $title = T_('RCON Tool');
-
-
-$servers = mysql_query( "SELECT `serverid`, `name` FROM `".DBPREFIX."server` WHERE `status` = 'Active' && `panelstatus` = 'Started' ORDER BY `name`" );
 
 
 //---------------------------------------------------------+
@@ -84,42 +81,35 @@ switch ($step)
 		include("./bootstrap/notifications.php");
 
 
+		$servers = getClientServers( $_SESSION['clientid'] )
+
+
 ?>
 			<div class="well">
 <?php
-
-		if (query_numrows( "SELECT `serverid` FROM `".DBPREFIX."server` WHERE `status` = 'Active' && `panelstatus` = 'Started'" ) != 0)
+		if (!empty($servers))
 		{
 ?>
 				<form method="get" action="utilitiesrcontool.php">
 					<label><?php echo T_('Available servers for RCON'); ?>&nbsp;:</label>
 						<select name="serverid">
 <?php
-
-			//---------------------------------------------------------+
-			while ($rowsServers = mysql_fetch_assoc($servers))
+			foreach($servers as $key => $value)
 			{
+				if ( ($value['status'] == 'Active') && ($value['panelstatus'] == 'Started') )
+				{
 ?>
-							<option value="<?php echo $rowsServers['serverid']; ?>">#<?php echo $rowsServers['serverid']; ?> - <?php echo htmlspecialchars($rowsServers['name'], ENT_QUOTES); ?></option>
+							<option value="<?php echo $value['serverid']; ?>">#<?php echo $value['serverid']; ?> - <?php echo htmlspecialchars($value['name'], ENT_QUOTES); ?></option>
 <?php
+				}
 			}
-			//---------------------------------------------------------+
-
+			unset($servers);
 ?>
 						</select>
 						<div style="text-align: center; margin-top: 19px;">
 							<button type="submit" class="btn btn-primary btn-large"><?php echo T_('RCON Console'); ?></button>
 						</div>
 				</form>
-<?php
-		}
-		else
-		{
-?>
-				<div class="alert alert-block">
-					<h4 class="alert-heading"><?php echo T_('No server available for RCON!'); ?></h4>
-					<?php echo T_('All servers are offline.'); ?>
-				</div>
 <?php
 		}
 ?>
@@ -142,9 +132,9 @@ switch ($step)
 
 
 	case 'rcon':
-		require("../includes/func.ssh2.inc.php");
-		require_once("../libs/phpseclib/Crypt/AES.php");
-		require_once("../libs/phpseclib/ANSI.php");
+		require("./includes/func.ssh2.inc.php");
+		require_once("./libs/phpseclib/Crypt/AES.php");
+		require_once("./libs/phpseclib/ANSI.php");
 		###
 		$error = '';
 		###
@@ -197,6 +187,17 @@ switch ($step)
 		$server = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."server` WHERE `serverid` = '".$serverid."' LIMIT 1" );
 		$box = query_fetch_assoc( "SELECT `ip`, `login`, `password`, `sshport` FROM `".DBPREFIX."box` WHERE `boxid` = '".$server['boxid']."' LIMIT 1" );
 		###
+		// Rights
+		$checkGroup = checkClientGroup($server['groupid'], $_SESSION['clientid']);
+		if ($checkGroup == FALSE)
+		{
+			$_SESSION['msg1'] = T_('Error!');
+			$_SESSION['msg2'] = T_('This is not your server!');
+			$_SESSION['msg-type'] = 'error';
+			header( 'Location: index.php' );
+			die();
+		}
+		###
 		$aes = new Crypt_AES();
 		$aes->setKeyLength(256);
 		$aes->setKey(CRYPT_KEY);
@@ -215,21 +216,31 @@ switch ($step)
 		$ansi = new File_ANSI();
 
 		// We retrieve screen name ($session)
-		$session = $ssh->exec( "screen -ls | awk '{ print $1 }' | grep '^[0-9]*\.".$server['screen']."$'"."\n" );
+		$session = $ssh->exec( "screen -ls | awk '{ print $1 }' | grep '^[0-9]*\.".escapeshellcmd($server['screen'])."$'"."\n" );
 		$session = trim($session);
+		
+		//Validate session before executing any commands
+		if (!$session || $session == '')
+		{
+			$_SESSION['msg1'] = T_('Connection Error!');
+			$_SESSION['msg2'] = T_('The server is not running and it may have crashed! Use "reboot" to re-start');
+			$_SESSION['msg-type'] = 'error';
+			header( 'Location: index.php' );
+			die();
+		}
 
 		if (!empty($_GET['cmd']))
 		{
-			$cmdRcon = $_GET['cmd'];
+			$cmdRcon = escapeshellcmd($_GET['cmd']);
 
 			// We prepare and we send the command into the screen
-			$cmd = "screen -S ".$session." -p 0 -X stuff \"".$cmdRcon."\"`echo -ne '\015'`";
+			$cmd = "screen -S ".escapeshellcmd($session)." -p 0 -X stuff \"".$cmdRcon."\"`echo -ne '\015'`";
 			$ssh->exec($cmd."\n");
 			unset($cmd);
 
 			// Adding event to the database
 			$message = 'RCON command ('.mysql_real_escape_string($cmdRcon).') sent to : '.mysql_real_escape_string($server['name']);
-			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['clientusername'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 			unset($cmdRcon);
 
 			header( 'Location: utilitiesrcontool.php?serverid='.urlencode($serverid) );
@@ -238,7 +249,7 @@ switch ($step)
 
 		// We retrieve screen contents
 		$ssh->write("screen -R ".$session."\n");
-		$ssh->setTimeout(1);
+		$ssh->setTimeout(3);
 
 		@$ansi->appendString($ssh->read());
 		$screenContents = htmlspecialchars_decode(strip_tags($ansi->getScreen()));
@@ -257,15 +268,11 @@ switch ($step)
 
 
 ?>
-			<script type="text/javascript">
-			$(document).ready(function() {
-				prettyPrint();
-			});
-			</script>
-			<div class="page-header">
-				<h1><small><?php echo htmlspecialchars($server['name'], ENT_QUOTES); ?></small></h1>
-			</div>
-<pre class="prettyprint">
+
+			<h1><small><?php echo htmlspecialchars($server['name'], ENT_QUOTES); ?></small></h1>
+
+			<div id="ajaxicon" style="float: right; margin-top: 32px; margin-right: 8px;"></div><br />
+<pre class="prettyprint" id="console">
 <?php
 
 		// Each lines are a value of rowsTable
@@ -274,7 +281,8 @@ switch ($step)
 		// Output
 		foreach ($rowsTable as $key => $value)
 		{
-			echo htmlentities($value, ENT_QUOTES);
+			if (isset($value) && trim($value) != '')
+				echo htmlentities($value, ENT_QUOTES);
 		}
 
 ?>
@@ -303,11 +311,11 @@ switch ($step)
 					<ul class="pager">
 						<li>
 							<a href="utilitiesrcontool.php"><?php echo T_('Back to RCON Tool Servers List'); ?></a>
-							<a href="serversummary.php?id=<?php echo $serverid; ?>"><?php echo T_('Go to Server Summary'); ?></a>
+							<a href="server.php?id=<?php echo $serverid; ?>"><?php echo T_('Go to Server Summary'); ?></a>
 						</li>
 					</ul>
 				</div>
-				<script type="text/javascript">
+				<script>
 				function dlScrLog()
 				{
 					if (confirm("<?php echo T_('Download SCREENLOG ?'); ?>"))
@@ -315,6 +323,33 @@ switch ($step)
 						window.location.href='serverprocess.php?task=getserverlog&serverid=<?php echo $serverid; ?>';
 					}
 				}
+
+				<!-- AJAX CONSOLE AUTO-LOAD -->
+
+				$(document).ready(function() {
+					prettyPrint();
+
+					function refreshConsole()
+					{
+						jQuery.ajax({
+							url: '<?php echo 'utilitiesrcontoolprocess.php?serverid='.urlencode($serverid); ?>',
+							success: function(data, textStatus, jqXHR) {
+								$( "#console" ).html( data );
+								prettyPrint();
+								$( "#ajaxicon" ).html( '' );
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								//$( "#console" ).html( 'Loading...' );
+							}
+						});
+					}
+
+					var refreshId = setInterval( function()
+					{
+						//$( "#ajaxicon" ).html( "<img src='./bootstrap/img/ajax-loader.gif' alt='loading...' />&nbsp;Loading..." );
+						refreshConsole();
+					}, 10000 );
+				});
 				</script>
 <?php
 		break;
