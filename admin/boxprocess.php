@@ -1,7 +1,5 @@
 <?php
 $return = TRUE;
-
-
 require("../configuration.php");
 require("./include.php");
 require("../includes/func.ssh2.inc.php");
