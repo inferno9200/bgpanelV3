@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'server';
 $tab = 2;
 $return = 'server.php';
@@ -40,7 +11,7 @@ require("./include.php");
 $title = T_('Servers');
 
 
-$servers = mysql_query( "SELECT * FROM `".DBPREFIX."server` ORDER BY `serverid`" );
+$servers = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."server` ORDER BY `serverid`" );
 
 
 include("./bootstrap/header.php");
@@ -84,7 +55,7 @@ include("./bootstrap/notifications.php");
 					<tbody>
 <?php
 
-if (mysql_num_rows($servers) == 0)
+if (mysqli_num_rows($servers) == 0)
 {
 ?>
 						<tr>
@@ -99,7 +70,7 @@ $mp = 0; //Max Players
 
 $n = 0;
 
-while ($rowsServers = mysql_fetch_assoc($servers))
+while ($rowsServers = mysqli_fetch_assoc($servers))
 {
 	$serverIp = query_fetch_assoc( "SELECT `ip` FROM `".DBPREFIX."boxIp` WHERE `ipid` = '".$rowsServers['ipid']."' LIMIT 1" );
 	$type = query_fetch_assoc( "SELECT `querytype` FROM `".DBPREFIX."game` WHERE `gameid` = '".$rowsServers['gameid']."' LIMIT 1");
@@ -190,7 +161,7 @@ while ($rowsServers = mysql_fetch_assoc($servers))
 				</table>
 <?php
 
-if (mysql_num_rows($servers) != 0)
+if (mysqli_num_rows($servers) != 0)
 {
 ?>
 				<script type="text/javascript">
@@ -251,7 +222,7 @@ if (mysql_num_rows($servers) != 0)
 						<button class="btn" onclick="window.location.reload();"><?php echo T_('Refresh'); ?></button>
 <?php
 
-if (mysql_num_rows($servers) != 0)
+if (mysqli_num_rows($servers) != 0)
 {
 ?>
 						<select name="actionOnMultipleServers" style="margin-bottom: 0px;">
