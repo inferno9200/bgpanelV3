@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'serverprofile';
 $tab = 2;
 $isSummary = TRUE;
@@ -64,8 +35,8 @@ $rows = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."server` WHERE `serverid` 
 $box = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."box` WHERE `boxid` = '".$rows['boxid']."' LIMIT 1" );
 $ip = query_fetch_assoc( "SELECT `ip`, `boxid` FROM `".DBPREFIX."boxIp` WHERE `ipid` = '".$rows['ipid']."' LIMIT 1" );
 $game = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."game` WHERE `gameid` = '".$rows['gameid']."' LIMIT 1" );
-$boxes = mysql_query( "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
-$groups = mysql_query( "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
+$boxes = mysqli_query($conn, "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
+$groups = mysqli_query($conn, "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
 
 $aes = new Crypt_AES();
 $aes->setKeyLength(256);
@@ -242,7 +213,7 @@ else
 
 	//---------------------------------------------------------+
 
-	while ($rowsGroups = mysql_fetch_assoc($groups))
+	while ($rowsGroups = mysqli_fetch_assoc($groups))
 	{
 		if ($rowsGroups['groupid'] == $rows['groupid'])
 		{
@@ -273,11 +244,11 @@ else
 
 		//---------------------------------------------------------+
 
-		while ($rowsBoxes = mysql_fetch_assoc($boxes))
+		while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 		{
-			$ips = mysql_query( "SELECT `ipid`, `ip` FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
+			$ips = mysqli_query($conn, "SELECT `ipid`, `ip` FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
 
-			while ($rowsIps = mysql_fetch_assoc($ips))
+			while ($rowsIps = mysqli_fetch_assoc($ips))
 			{
 				if ($rowsIps['ipid'] == $rows['ipid'])
 				{
@@ -307,7 +278,7 @@ else
 
 		//---------------------------------------------------------+
 
-		while ($rowsBoxes = mysql_fetch_assoc($boxes))
+		while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 		{
 			if ($rowsBoxes['boxid'] == $ip['boxid'])
 			{

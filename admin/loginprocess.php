@@ -1,56 +1,22 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 require("../configuration.php");
 require("./include.php");
 
 
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
-
-
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-
 switch(@$task)
 {
 	case 'processlogin':
-		$username = mysql_real_escape_string($_POST['username']);
-		$password = mysql_real_escape_string($_POST['password']);
+		$username = mysqli_real_escape_string($conn, $_POST['username']);
+		$password = mysqli_real_escape_string($conn, $_POST['password']);
 		$return = $_POST['return'];
 		###
 		if (!empty($username) && !empty($password))
@@ -137,8 +103,8 @@ switch(@$task)
 		break;
 
 	case 'processpassword':
-		$username = mysql_real_escape_string($_POST['username']);
-		$email = mysql_real_escape_string($_POST['email']);
+		$username = mysqli_real_escape_string($conn, $_POST['username']);
+		$email = mysqli_real_escape_string($conn, $_POST['email']);
 		###
 		/**
 		 * Securimage - A PHP class for creating captcha images.
@@ -210,5 +176,5 @@ switch(@$task)
 		exit('<h1><b>Error</b></h1>');
 }
 
-exit('<h1><b>403 Forbidden</b></h1>'); //If the task is incorrect or unspecified, we drop the user.
+exit('<h1><b>403 Forbidden</b></h1>');
 ?>

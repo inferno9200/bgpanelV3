@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
 
 
@@ -37,11 +8,11 @@ require("./include.php");
 
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
 
 
@@ -95,9 +66,9 @@ $output .= "\n".
 	str_pad("Timestamp:", 19)."\n";
 //---------------------------------------------------------+
 
-		$logs = mysql_query( "SELECT * FROM `".DBPREFIX."log` ORDER BY `logid` DESC" );
+		$logs = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."log` ORDER BY `logid` DESC" );
 
-		while ($rowsLogs = mysql_fetch_assoc($logs))
+		while ($rowsLogs = mysqli_fetch_assoc($logs))
 		{
 //---------------------------------------------------------+
 $output .=
@@ -132,24 +103,24 @@ $output .= "
 		 * @link: http://www.comscripts.com/sources/php.export-csv.102.html
 		 */
 
-		$resQuery = mysql_query( "SELECT * FROM `".DBPREFIX."log` ORDER BY `logid` DESC" );
+		$resQuery = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."log` ORDER BY `logid` DESC" );
 
 		header("Content-Type: application/csv-tab-delimited-table");
 		header('Content-Disposition: attachment; filename="bgp-activity-logs-'.date('Y-m-d').'.csv"');
 
-		if (mysql_num_rows($resQuery) != 0)
+		if (mysqli_num_rows($resQuery) != 0)
 		{
 			// Columns
-			$fields = mysql_num_fields($resQuery);
+			$fields = mysqli_num_fields($resQuery);
 			$i = 0;
 			while ($i < $fields) {
-				echo mysql_field_name($resQuery, $i).";";
+				echo mysqli_field_name($resQuery, $i).";";
 				$i++;
 			}
 			echo "\n";
 
 			// Table data
-			while ($arrSelect = mysql_fetch_array($resQuery, MYSQL_ASSOC)) {
+			while ($arrSelect = mysqli_fetch_array($resQuery, MYSQLI_ASSOC)) {
 				foreach($arrSelect as $elem) {
 					echo "$elem;";
 				}

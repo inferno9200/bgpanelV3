@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
 
 
@@ -38,42 +9,42 @@ include("../libs/lgsl/lgsl_protocol.php");
 
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
 
 
 switch (@$task)
 {
 	case 'configgameadd':
-		$gameName = mysql_real_escape_string($_POST['gameName']);
-		$maxSlots = mysql_real_escape_string($_POST['maxSlots']);
-		$defaultPort = mysql_real_escape_string($_POST['defaultPort']);
-		$cfg1Name = mysql_real_escape_string($_POST['cfg1Name']);
-		$cfg1 = mysql_real_escape_string($_POST['cfg1']);
-		$cfg2Name = mysql_real_escape_string($_POST['cfg2Name']);
-		$cfg2 = mysql_real_escape_string($_POST['cfg2']);
-		$cfg3Name = mysql_real_escape_string($_POST['cfg3Name']);
-		$cfg3 = mysql_real_escape_string($_POST['cfg3']);
-		$cfg4Name = mysql_real_escape_string($_POST['cfg4Name']);
-		$cfg4 = mysql_real_escape_string($_POST['cfg4']);
-		$cfg5Name = mysql_real_escape_string($_POST['cfg5Name']);
-		$cfg5 = mysql_real_escape_string($_POST['cfg5']);
-		$cfg6Name = mysql_real_escape_string($_POST['cfg6Name']);
-		$cfg6 = mysql_real_escape_string($_POST['cfg6']);
-		$cfg7Name = mysql_real_escape_string($_POST['cfg7Name']);
-		$cfg7 = mysql_real_escape_string($_POST['cfg7']);
-		$cfg8Name = mysql_real_escape_string($_POST['cfg8Name']);
-		$cfg8 = mysql_real_escape_string($_POST['cfg8']);
-		$cfg9Name = mysql_real_escape_string($_POST['cfg9Name']);
-		$cfg9 = mysql_real_escape_string($_POST['cfg9']);
-		$startLine = mysql_real_escape_string($_POST['startLine']);
-		$queryType = mysql_real_escape_string($_POST['queryType']);
-		$queryPort = mysql_real_escape_string($_POST['queryPort']);
-		$cacheDir = mysql_real_escape_string($_POST['cacheDir']);
+		$gameName = mysqli_real_escape_string($conn, $_POST['gameName']);
+		$maxSlots = mysqli_real_escape_string($conn, $_POST['maxSlots']);
+		$defaultPort = mysqli_real_escape_string($conn, $_POST['defaultPort']);
+		$cfg1Name = mysqli_real_escape_string($conn, $_POST['cfg1Name']);
+		$cfg1 = mysqli_real_escape_string($conn, $_POST['cfg1']);
+		$cfg2Name = mysqli_real_escape_string($conn, $_POST['cfg2Name']);
+		$cfg2 = mysqli_real_escape_string($conn, $_POST['cfg2']);
+		$cfg3Name = mysqli_real_escape_string($conn, $_POST['cfg3Name']);
+		$cfg3 = mysqli_real_escape_string($conn, $_POST['cfg3']);
+		$cfg4Name = mysqli_real_escape_string($conn, $_POST['cfg4Name']);
+		$cfg4 = mysqli_real_escape_string($conn, $_POST['cfg4']);
+		$cfg5Name = mysqli_real_escape_string($conn, $_POST['cfg5Name']);
+		$cfg5 = mysqli_real_escape_string($conn, $_POST['cfg5']);
+		$cfg6Name = mysqli_real_escape_string($conn, $_POST['cfg6Name']);
+		$cfg6 = mysqli_real_escape_string($conn, $_POST['cfg6']);
+		$cfg7Name = mysqli_real_escape_string($conn, $_POST['cfg7Name']);
+		$cfg7 = mysqli_real_escape_string($conn, $_POST['cfg7']);
+		$cfg8Name = mysqli_real_escape_string($conn, $_POST['cfg8Name']);
+		$cfg8 = mysqli_real_escape_string($conn, $_POST['cfg8']);
+		$cfg9Name = mysqli_real_escape_string($conn, $_POST['cfg9Name']);
+		$cfg9 = mysqli_real_escape_string($conn, $_POST['cfg9']);
+		$startLine = mysqli_real_escape_string($conn, $_POST['startLine']);
+		$queryType = mysqli_real_escape_string($conn, $_POST['queryType']);
+		$queryPort = mysqli_real_escape_string($conn, $_POST['queryPort']);
+		$cacheDir = mysqli_real_escape_string($conn, $_POST['cacheDir']);
 		###
 		//Used to fill in the blanks of the form
 		$_SESSION['gameName'] = $gameName;
@@ -232,33 +203,33 @@ switch (@$task)
 		break;
 
 	case 'configgameedit':
-		$gameid = mysql_real_escape_string($_POST['gameid']);
-		$gameName = mysql_real_escape_string($_POST['gameName']);
-		$status = mysql_real_escape_string($_POST['status']);
-		$maxSlots = mysql_real_escape_string($_POST['maxSlots']);
-		$defaultPort = mysql_real_escape_string($_POST['defaultPort']);
-		$cfg1Name = mysql_real_escape_string($_POST['cfg1Name']);
-		$cfg1 = mysql_real_escape_string($_POST['cfg1']);
-		$cfg2Name = mysql_real_escape_string($_POST['cfg2Name']);
-		$cfg2 = mysql_real_escape_string($_POST['cfg2']);
-		$cfg3Name = mysql_real_escape_string($_POST['cfg3Name']);
-		$cfg3 = mysql_real_escape_string($_POST['cfg3']);
-		$cfg4Name = mysql_real_escape_string($_POST['cfg4Name']);
-		$cfg4 = mysql_real_escape_string($_POST['cfg4']);
-		$cfg5Name = mysql_real_escape_string($_POST['cfg5Name']);
-		$cfg5 = mysql_real_escape_string($_POST['cfg5']);
-		$cfg6Name = mysql_real_escape_string($_POST['cfg6Name']);
-		$cfg6 = mysql_real_escape_string($_POST['cfg6']);
-		$cfg7Name = mysql_real_escape_string($_POST['cfg7Name']);
-		$cfg7 = mysql_real_escape_string($_POST['cfg7']);
-		$cfg8Name = mysql_real_escape_string($_POST['cfg8Name']);
-		$cfg8 = mysql_real_escape_string($_POST['cfg8']);
-		$cfg9Name = mysql_real_escape_string($_POST['cfg9Name']);
-		$cfg9 = mysql_real_escape_string($_POST['cfg9']);
-        $startLine = mysql_real_escape_string( $_POST['startLine'] );
-		$queryType = mysql_real_escape_string($_POST['queryType']);
-		$queryPort = mysql_real_escape_string($_POST['queryPort']);
-		$cacheDir = mysql_real_escape_string($_POST['cacheDir']);
+		$gameid = mysqli_real_escape_string($conn, $_POST['gameid']);
+		$gameName = mysqli_real_escape_string($conn, $_POST['gameName']);
+		$status = mysqli_real_escape_string($conn, $_POST['status']);
+		$maxSlots = mysqli_real_escape_string($conn, $_POST['maxSlots']);
+		$defaultPort = mysqli_real_escape_string($conn, $_POST['defaultPort']);
+		$cfg1Name = mysqli_real_escape_string($conn, $_POST['cfg1Name']);
+		$cfg1 = mysqli_real_escape_string($conn, $_POST['cfg1']);
+		$cfg2Name = mysqli_real_escape_string($conn, $_POST['cfg2Name']);
+		$cfg2 = mysqli_real_escape_string($conn, $_POST['cfg2']);
+		$cfg3Name = mysqli_real_escape_string($conn, $_POST['cfg3Name']);
+		$cfg3 = mysqli_real_escape_string($conn, $_POST['cfg3']);
+		$cfg4Name = mysqli_real_escape_string($conn, $_POST['cfg4Name']);
+		$cfg4 = mysqli_real_escape_string($conn, $_POST['cfg4']);
+		$cfg5Name = mysqli_real_escape_string($conn, $_POST['cfg5Name']);
+		$cfg5 = mysqli_real_escape_string($conn, $_POST['cfg5']);
+		$cfg6Name = mysqli_real_escape_string($conn, $_POST['cfg6Name']);
+		$cfg6 = mysqli_real_escape_string($conn, $_POST['cfg6']);
+		$cfg7Name = mysqli_real_escape_string($conn, $_POST['cfg7Name']);
+		$cfg7 = mysqli_real_escape_string($conn, $_POST['cfg7']);
+		$cfg8Name = mysqli_real_escape_string($conn, $_POST['cfg8Name']);
+		$cfg8 = mysqli_real_escape_string($conn, $_POST['cfg8']);
+		$cfg9Name = mysqli_real_escape_string($conn, $_POST['cfg9Name']);
+		$cfg9 = mysqli_real_escape_string($conn, $_POST['cfg9']);
+        $startLine = mysqli_real_escape_string($conn, $_POST['startLine'] );
+		$queryType = mysqli_real_escape_string($conn, $_POST['queryType']);
+		$queryPort = mysqli_real_escape_string($conn, $_POST['queryPort']);
+		$cacheDir = mysqli_real_escape_string($conn, $_POST['cacheDir']);
 		###
 		//Check the inputs. Output an error if the validation failed
 		$gameLength = strlen($gameName);

@@ -1,41 +1,10 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
-
 
 require("../configuration.php");
 require("./include.php");
 require("../includes/func.ssh2.inc.php");
 require_once("../libs/phpseclib/Crypt/AES.php");
-
 
 if (isset($_POST['actionOnMultipleServers']))
 {
@@ -157,9 +126,9 @@ switch (@$task)
 			query_basic( "UPDATE `".DBPREFIX."server` SET `panelstatus` = 'Started' WHERE `serverid` = '".$serverid."'" );
 
 			//Adding event to the database
-			$message = 'Server Started : '.mysql_real_escape_string($server['name']);
+			$message = 'Server Started : '.mysqli_real_escape_string($conn, $server['name']);
 			$startedServers .= "<li>{$server['name']}</li>";
-			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		}
 
 		$startedServers .= '</ul>';
@@ -246,9 +215,9 @@ switch (@$task)
 			query_basic( "UPDATE `".DBPREFIX."server` SET `panelstatus` = 'Stopped' WHERE `serverid` = '".$serverid."'" );
 			###
 			//Adding event to the database
-			$message = 'Server Stopped : '.mysql_real_escape_string($server['name']);
+			$message = 'Server Stopped : '.mysqli_real_escape_string($conn, $server['name']);
 			$stoppedServers .= "<li>{$server['name']}</li>";
-			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		}
 
 		$stoppedServers .= '</ul>';
@@ -379,9 +348,9 @@ switch (@$task)
 			query_basic( "UPDATE `".DBPREFIX."server` SET `panelstatus` = 'Started' WHERE `serverid` = '".$serverid."'" );
 
 			//Adding event to the database
-			$message = 'Server Rebooted : '.mysql_real_escape_string($server['name']);
+			$message = 'Server Rebooted : '.mysqli_real_escape_string($conn, $server['name']);
 			$rebootedServers .= "<li>{$server['name']}</li>";
-			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		}
 
 		$rebootedServers .= '</ul>';
@@ -477,9 +446,9 @@ switch (@$task)
 			$ssh->disconnect();
 
 			//Adding event to the database
-			$message = 'Server Update : '.mysql_real_escape_string($server['name']);
+			$message = 'Server Update : '.mysqli_real_escape_string($conn, $server['name']);
 			$updatedServers .= "<li>{$server['name']}</li>";
-			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+			query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		}
 
 		$updatedServers .= '</ul>';

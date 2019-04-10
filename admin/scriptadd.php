@@ -1,44 +1,12 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'scriptadd';
 $tab = 5;
 $return = 'scriptadd.php';
 
-
 require("../configuration.php");
 require("./include.php");
 
-
 $title = T_('Add New Script');
-
 
 $numBoxes = query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box`" );
 $numCats = query_numrows( "SELECT `id` FROM `".DBPREFIX."scriptCat`" );
@@ -127,9 +95,9 @@ switch ($step)
 
 
 	case 'form':
-		$boxes = mysql_query( "SELECT `boxid`, `name`, `ip` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
-		$categories = mysql_query( "SELECT `id`, `name` FROM `".DBPREFIX."scriptCat` ORDER BY `id`" );
-		$groups = mysql_query( "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
+		$boxes = mysqli_query($conn, "SELECT `boxid`, `name`, `ip` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
+		$categories = mysqli_query($conn, "SELECT `id`, `name` FROM `".DBPREFIX."scriptCat` ORDER BY `id`" );
+		$groups = mysqli_query($conn, "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
 		###
 ?>
 			<div class="well">
@@ -156,7 +124,7 @@ if (isset($_SESSION['description']))
 							<option value="none"><?php echo T_('None'); ?></option>
 <?php
 //---------------------------------------------------------+
-while ($rowsGroups = mysql_fetch_assoc($groups))
+while ($rowsGroups = mysqli_fetch_assoc($groups))
 {
 	if (isset($_SESSION['groupid']) && $rowsGroups['groupid'] == $_SESSION['groupid'])
 	{
@@ -179,7 +147,7 @@ while ($rowsGroups = mysql_fetch_assoc($groups))
 						<select name="boxID">
 <?php
 //---------------------------------------------------------+
-while ($rowsBoxes = mysql_fetch_assoc($boxes))
+while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 {
 	if (isset($_SESSION['boxid']) && $rowsBoxes['boxid'] == $_SESSION['boxid'])
 	{
@@ -202,7 +170,7 @@ while ($rowsBoxes = mysql_fetch_assoc($boxes))
 						<select name="catID">
 <?php
 //---------------------------------------------------------+
-while ($rowsCategories = mysql_fetch_assoc($categories))
+while ($rowsCategories = mysqli_fetch_assoc($categories))
 {
 	if (isset($_SESSION['catid']) && $rowsCategories['id'] == $_SESSION['catid'])
 	{

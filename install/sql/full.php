@@ -1,51 +1,9 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 //Prevent direct access
 if (!defined('LICENSE'))
 {
 	exit('Access Denied');
 }
-
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-//System URL auto-config
-
-
-/*
- *
- * SOURCE: http://webcheatsheet.com/php/get_current_page_url.php
- *
- */
-
 $pageURL = 'http';
 
 if (@$_SERVER["HTTPS"] == "on")
@@ -72,14 +30,14 @@ $systemurl = substr($pageURL, 0, -41);
 //MySQL
 
 
-$mysql_link = mysql_connect(DBHOST,DBUSER,DBPASSWORD);
+$mysql_link = mysqli_connect(DBHOST,DBUSER,DBPASSWORD);
 if (!$mysql_link)
 {
-	die('Could not connect to MySQL: '.mysql_error());
+	die('Could not connect to MySQL: '.mysqli_error($conn));
 }
 else
 {
-	$mysql_database_link = mysql_select_db(DBNAME);
+	$mysql_database_link = mysqli_select_db($conn, DBNAME);
 	if ($mysql_database_link == FALSE)
 	{
 		echo "Could not connect to MySQL database";
@@ -90,20 +48,6 @@ else
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-
-		//---------------------------------------------------------+
-
-		/*
-		-- BrightGamePanel Database
-		-- Version 0.4.5
-		-- 21/08/2013
-		*/
-
-		//---------------------------------------------------------+
-
-
-
 		//Table structure for table "admin"
 
 			query_basic( "DROP TABLE IF EXISTS `".DBPREFIX."admin`  ; " );
@@ -459,7 +403,7 @@ else
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-		mysql_close($mysql_link);
+		mysqli_close($mysql_link);
 	}
 }
 
