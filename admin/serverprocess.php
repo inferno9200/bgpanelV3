@@ -1,85 +1,54 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
-
 
 require("../configuration.php");
 require("./include.php");
 require("../includes/func.ssh2.inc.php");
 require_once("../libs/phpseclib/Crypt/AES.php");
 
-
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
 
 
 switch (@$task)
 {
 	case 'serveradd':
-		$groupid = mysql_real_escape_string($_POST['groupID']);
-		$ipid = mysql_real_escape_string($_POST['ipID']);
-		$gameid = mysql_real_escape_string($_POST['gameID']);
-		$name = mysql_real_escape_string($_POST['name']);
-		$priority = mysql_real_escape_string($_POST['priority']);
-		$slots = mysql_real_escape_string($_POST['slots']);
-		$port = mysql_real_escape_string($_POST['port']);
-		$queryport = mysql_real_escape_string($_POST['queryPort']);
-		$cfg1Name = mysql_real_escape_string($_POST['cfg1Name']);
-		$cfg1 = mysql_real_escape_string($_POST['cfg1']);
-		$cfg2Name = mysql_real_escape_string($_POST['cfg2Name']);
-		$cfg2 = mysql_real_escape_string($_POST['cfg2']);
-		$cfg3Name = mysql_real_escape_string($_POST['cfg3Name']);
-		$cfg3 = mysql_real_escape_string($_POST['cfg3']);
-		$cfg4Name = mysql_real_escape_string($_POST['cfg4Name']);
-		$cfg4 = mysql_real_escape_string($_POST['cfg4']);
-		$cfg5Name = mysql_real_escape_string($_POST['cfg5Name']);
-		$cfg5 = mysql_real_escape_string($_POST['cfg5']);
-		$cfg6Name = mysql_real_escape_string($_POST['cfg6Name']);
-		$cfg6 = mysql_real_escape_string($_POST['cfg6']);
-		$cfg7Name = mysql_real_escape_string($_POST['cfg7Name']);
-		$cfg7 = mysql_real_escape_string($_POST['cfg7']);
-		$cfg8Name = mysql_real_escape_string($_POST['cfg8Name']);
-		$cfg8 = mysql_real_escape_string($_POST['cfg8']);
-		$cfg9Name = mysql_real_escape_string($_POST['cfg9Name']);
-		$cfg9 = mysql_real_escape_string($_POST['cfg9']);
-		$startline = mysql_real_escape_string($_POST['startLine']);
-		$action = mysql_real_escape_string($_POST['radioAction']);;
-		$path = mysql_real_escape_string($_POST['path']); // Link
-		$path2 = mysql_real_escape_string($_POST['path2']); // Create
+		$groupid = mysqli_real_escape_string($conn, $_POST['groupID']);
+		$ipid = mysqli_real_escape_string($conn, $_POST['ipID']);
+		$gameid = mysqli_real_escape_string($conn, $_POST['gameID']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$priority = mysqli_real_escape_string($conn, $_POST['priority']);
+		$slots = mysqli_real_escape_string($conn, $_POST['slots']);
+		$port = mysqli_real_escape_string($conn, $_POST['port']);
+		$queryport = mysqli_real_escape_string($conn, $_POST['queryPort']);
+		$cfg1Name = mysqli_real_escape_string($conn, $_POST['cfg1Name']);
+		$cfg1 = mysqli_real_escape_string($conn, $_POST['cfg1']);
+		$cfg2Name = mysqli_real_escape_string($conn, $_POST['cfg2Name']);
+		$cfg2 = mysqli_real_escape_string($conn, $_POST['cfg2']);
+		$cfg3Name = mysqli_real_escape_string($conn, $_POST['cfg3Name']);
+		$cfg3 = mysqli_real_escape_string($conn, $_POST['cfg3']);
+		$cfg4Name = mysqli_real_escape_string($conn, $_POST['cfg4Name']);
+		$cfg4 = mysqli_real_escape_string($conn, $_POST['cfg4']);
+		$cfg5Name = mysqli_real_escape_string($conn, $_POST['cfg5Name']);
+		$cfg5 = mysqli_real_escape_string($conn, $_POST['cfg5']);
+		$cfg6Name = mysqli_real_escape_string($conn, $_POST['cfg6Name']);
+		$cfg6 = mysqli_real_escape_string($conn, $_POST['cfg6']);
+		$cfg7Name = mysqli_real_escape_string($conn, $_POST['cfg7Name']);
+		$cfg7 = mysqli_real_escape_string($conn, $_POST['cfg7']);
+		$cfg8Name = mysqli_real_escape_string($conn, $_POST['cfg8Name']);
+		$cfg8 = mysqli_real_escape_string($conn, $_POST['cfg8']);
+		$cfg9Name = mysqli_real_escape_string($conn, $_POST['cfg9Name']);
+		$cfg9 = mysqli_real_escape_string($conn, $_POST['cfg9']);
+		$startline = mysqli_real_escape_string($conn, $_POST['startLine']);
+		$action = mysqli_real_escape_string($conn, $_POST['radioAction']);;
+		$path = mysqli_real_escape_string($conn, $_POST['path']); // Link
+		$path2 = mysqli_real_escape_string($conn, $_POST['path2']); // Create
 		###
 		$boxidQuery = query_fetch_assoc( "SELECT `boxid` FROM `".DBPREFIX."boxIp` WHERE `ipid` = '".$ipid."' LIMIT 1" );
 		$boxid = $boxidQuery['boxid'];
@@ -282,13 +251,13 @@ switch (@$task)
 				unset($_SESSION['path2']);
 				###
 				//Adding the server to the database
-				query_basic( "INSERT INTO `".DBPREFIX."server` SET
+				$sql = ( "INSERT INTO `".DBPREFIX."server` SET
 					`groupid` = '".$groupid."',
 					`boxid` = '".$boxid."',
 					`ipid` = '".$ipid."',
 					`gameid` = '".$gameid."',
 					`name` = '".$name."',
-					`game` = '".mysql_real_escape_string($game['game'])."',
+					`game` = '".mysqli_real_escape_string($conn, $game['game'])."',
 					`status` = 'Pending',
 					`panelstatus` = 'Stopped',
 					`slots` = '".$slots."',
@@ -317,12 +286,13 @@ switch (@$task)
 					`path` = '".$path."',
 					`screen` = '".preg_replace('#[^a-zA-Z0-9]#', "_", $name)."'" );
 				###
-				$serverid = mysql_insert_id();
+				mysqli_query($conn, $sql);
+				$serverid = mysqli_insert_id($conn);
 				###
 				//LGSL
 				query_basic( "INSERT INTO `".DBPREFIX."lgsl` SET
 					`id` = '".$serverid."',
-					`type` = '".mysql_real_escape_string($game['querytype'])."',
+					`type` = '".mysqli_real_escape_string($conn, $game['querytype'])."',
 					`ip` = '".$serverIp['ip']."',
 					`c_port` = '".$port."',
 					`q_port` = '".$queryport."',
@@ -336,7 +306,7 @@ switch (@$task)
 				###
 				//Adding event to the database
 				$message = "Server Added: ".$name;
-				query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+				query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 				###
 				$_SESSION['msg1'] = T_('Server Added Successfully!');
 				$_SESSION['msg2'] = T_('The new server has been added but must be validated.');
@@ -444,13 +414,13 @@ switch (@$task)
 				unset($_SESSION['path2']);
 				###
 				//Adding the server to the database
-				query_basic( "INSERT INTO `".DBPREFIX."server` SET
+				$sql = ( "INSERT INTO `".DBPREFIX."server` SET
 					`groupid` = '".$groupid."',
 					`boxid` = '".$boxid."',
 					`ipid` = '".$ipid."',
 					`gameid` = '".$gameid."',
 					`name` = '".$name."',
-					`game` = '".mysql_real_escape_string($game['game'])."',
+					`game` = '".mysqli_real_escape_string($conn, $game['game'])."',
 					`status` = 'Active',
 					`panelstatus` = 'Stopped',
 					`slots` = '".$slots."',
@@ -479,12 +449,13 @@ switch (@$task)
 					`path` = '".$realGameServerPath."',
 					`screen` = '".preg_replace('#[^a-zA-Z0-9]#', "_", $name)."'" );
 				###
-				$serverid = mysql_insert_id();
+				mysqli_query($conn, $sql);
+				$serverid = mysqli_insert_id($conn);
 				###
 				//LGSL
 				query_basic( "INSERT INTO `".DBPREFIX."lgsl` SET
 					`id` = '".$serverid."',
-					`type` = '".mysql_real_escape_string($game['querytype'])."',
+					`type` = '".mysqli_real_escape_string($conn, $game['querytype'])."',
 					`ip` = '".$serverIp['ip']."',
 					`c_port` = '".$port."',
 					`q_port` = '".$queryport."',
@@ -498,7 +469,7 @@ switch (@$task)
 				###
 				//Adding event to the database
 				$message = "Server Added: ".$name;
-				query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+				query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 				###
 				$_SESSION['msg1'] = T_('Server Added Successfully!');
 				$_SESSION['msg2'] = T_('The new server has been added and is currently being created.');
@@ -510,35 +481,35 @@ switch (@$task)
 		break;
 
 	case 'serverprofile':
-		$serverid = mysql_real_escape_string($_POST['serverid']);
-		$status = mysql_real_escape_string($_POST['status']);
-		$name = mysql_real_escape_string($_POST['name']);
-		$groupid = mysql_real_escape_string($_POST['groupid']);
-		$ipid = mysql_real_escape_string($_POST['ipid']);
-		$priority = mysql_real_escape_string($_POST['priority']);
-		$slots = mysql_real_escape_string($_POST['slots']);
-		$port = mysql_real_escape_string($_POST['port']);
-		$queryport = mysql_real_escape_string($_POST['queryPort']);
-		$cfg1Name = mysql_real_escape_string($_POST['cfg1Name']);
-		$cfg1 = mysql_real_escape_string($_POST['cfg1']);
-		$cfg2Name = mysql_real_escape_string($_POST['cfg2Name']);
-		$cfg2 = mysql_real_escape_string($_POST['cfg2']);
-		$cfg3Name = mysql_real_escape_string($_POST['cfg3Name']);
-		$cfg3 = mysql_real_escape_string($_POST['cfg3']);
-		$cfg4Name = mysql_real_escape_string($_POST['cfg4Name']);
-		$cfg4 = mysql_real_escape_string($_POST['cfg4']);
-		$cfg5Name = mysql_real_escape_string($_POST['cfg5Name']);
-		$cfg5 = mysql_real_escape_string($_POST['cfg5']);
-		$cfg6Name = mysql_real_escape_string($_POST['cfg6Name']);
-		$cfg6 = mysql_real_escape_string($_POST['cfg6']);
-		$cfg7Name = mysql_real_escape_string($_POST['cfg7Name']);
-		$cfg7 = mysql_real_escape_string($_POST['cfg7']);
-		$cfg8Name = mysql_real_escape_string($_POST['cfg8Name']);
-		$cfg8 = mysql_real_escape_string($_POST['cfg8']);
-		$cfg9Name = mysql_real_escape_string($_POST['cfg9Name']);
-		$cfg9 = mysql_real_escape_string($_POST['cfg9']);
-		$startline = mysql_real_escape_string($_POST['startLine']);
-		$path = mysql_real_escape_string($_POST['path']);
+		$serverid = mysqli_real_escape_string($conn, $_POST['serverid']);
+		$status = mysqli_real_escape_string($conn, $_POST['status']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$groupid = mysqli_real_escape_string($conn, $_POST['groupid']);
+		$ipid = mysqli_real_escape_string($conn, $_POST['ipid']);
+		$priority = mysqli_real_escape_string($conn, $_POST['priority']);
+		$slots = mysqli_real_escape_string($conn, $_POST['slots']);
+		$port = mysqli_real_escape_string($conn, $_POST['port']);
+		$queryport = mysqli_real_escape_string($conn, $_POST['queryPort']);
+		$cfg1Name = mysqli_real_escape_string($conn, $_POST['cfg1Name']);
+		$cfg1 = mysqli_real_escape_string($conn, $_POST['cfg1']);
+		$cfg2Name = mysqli_real_escape_string($conn, $_POST['cfg2Name']);
+		$cfg2 = mysqli_real_escape_string($conn, $_POST['cfg2']);
+		$cfg3Name = mysqli_real_escape_string($conn, $_POST['cfg3Name']);
+		$cfg3 = mysqli_real_escape_string($conn, $_POST['cfg3']);
+		$cfg4Name = mysqli_real_escape_string($conn, $_POST['cfg4Name']);
+		$cfg4 = mysqli_real_escape_string($conn, $_POST['cfg4']);
+		$cfg5Name = mysqli_real_escape_string($conn, $_POST['cfg5Name']);
+		$cfg5 = mysqli_real_escape_string($conn, $_POST['cfg5']);
+		$cfg6Name = mysqli_real_escape_string($conn, $_POST['cfg6Name']);
+		$cfg6 = mysqli_real_escape_string($conn, $_POST['cfg6']);
+		$cfg7Name = mysqli_real_escape_string($conn, $_POST['cfg7Name']);
+		$cfg7 = mysqli_real_escape_string($conn, $_POST['cfg7']);
+		$cfg8Name = mysqli_real_escape_string($conn, $_POST['cfg8Name']);
+		$cfg8 = mysqli_real_escape_string($conn, $_POST['cfg8']);
+		$cfg9Name = mysqli_real_escape_string($conn, $_POST['cfg9Name']);
+		$cfg9 = mysqli_real_escape_string($conn, $_POST['cfg9']);
+		$startline = mysqli_real_escape_string($conn, $_POST['startLine']);
+		$path = mysqli_real_escape_string($conn, $_POST['path']);
 		###
 		$boxidQuery = query_fetch_assoc( "SELECT `boxid` FROM `".DBPREFIX."boxIp` WHERE `ipid` = '".$ipid."' LIMIT 1" );
 		$boxid = $boxidQuery['boxid'];
@@ -715,7 +686,7 @@ switch (@$task)
 		###
 		//Adding event to the database
 		$message = "Server Edited: ".$name;
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Updated Successfully!');
 		$_SESSION['msg2'] = T_('Your changes to the server have been saved.');
@@ -865,8 +836,8 @@ switch (@$task)
 		query_basic( "UPDATE `".DBPREFIX."server` SET `status` = 'Active' WHERE `serverid` = '".$serverid."'" );
 		###
 		//Adding event to the database
-		$message = 'Server Validated : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Validated : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Successfully Validated!');
 		$_SESSION['msg2'] = T_('The server is now ready for use.');
@@ -931,8 +902,8 @@ switch (@$task)
 		$sftp->disconnect();
 
 		//Adding event to the database
-		$message = mysql_real_escape_string($server['name']).' : screenlog downloaded';
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = mysqli_real_escape_string($conn, $server['name']).' : screenlog downloaded';
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		header('Content-type: text/plain');
 		header('Content-Disposition: attachment; filename="'.$server['screen'].'_'.date('Y-m-d').'.screenlog"');
@@ -1029,9 +1000,9 @@ switch (@$task)
 		query_basic( "DELETE FROM `".DBPREFIX."server` WHERE `serverid` = '".$serverid."' LIMIT 1" );
 		query_basic( "DELETE FROM `".DBPREFIX."lgsl` WHERE `id` = '".$serverid."' LIMIT 1" ); //LGSL
 		###
-		$message = 'Server Deleted: '.mysql_real_escape_string($rows['name']);
+		$message = 'Server Deleted: '.mysqli_real_escape_string($conn, $rows['name']);
 		###
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `boxid` = '".$rows['boxid']."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `boxid` = '".$rows['boxid']."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Deleted Successfully!');
 		$_SESSION['msg2'] = T_('The selected server has been removed.');
@@ -1175,8 +1146,8 @@ switch (@$task)
 		query_basic( "UPDATE `".DBPREFIX."server` SET `panelstatus` = 'Started' WHERE `serverid` = '".$serverid."'" );
 		###
 		//Adding event to the database
-		$message = 'Server Started : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Started : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Successfully Started!');
 		$_SESSION['msg2'] = T_('With command').' : '.htmlspecialchars($startline, ENT_QUOTES);
@@ -1280,8 +1251,8 @@ switch (@$task)
 		query_basic( "UPDATE `".DBPREFIX."server` SET `panelstatus` = 'Stopped' WHERE `serverid` = '".$serverid."'" );
 		###
 		//Adding event to the database
-		$message = 'Server Stopped : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Stopped : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Successfully Stopped!');
 		$_SESSION['msg2'] = '';
@@ -1427,8 +1398,8 @@ switch (@$task)
 		query_basic( "UPDATE `".DBPREFIX."server` SET `panelstatus` = 'Started' WHERE `serverid` = '".$serverid."'" );
 		###
 		//Adding event to the database
-		$message = 'Server Rebooted : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Rebooted : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Successfully Rebooted!');
 		$_SESSION['msg2'] = '';
@@ -1443,7 +1414,7 @@ switch (@$task)
 	case 'makeGameServer':
 		require_once("../libs/gameinstaller/gameinstaller.php");
 		###
-		$serverid = mysql_real_escape_string($_GET['serverid']);
+		$serverid = mysqli_real_escape_string($conn, $_GET['serverid']);
 		###
 		if (!is_numeric($serverid))
 		{
@@ -1543,8 +1514,8 @@ switch (@$task)
 		}
 		###
 		//Adding event to the database
-		$message = 'Server Contents Reset : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Contents Reset : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Installing Game Server!');
 		$_SESSION['msg2'] = T_('Your game server is currently being created. Please wait...');
@@ -1556,7 +1527,7 @@ switch (@$task)
 	case 'updateGameServer':
 		require_once("../libs/gameinstaller/gameinstaller.php");
 		###
-		$serverid = mysql_real_escape_string($_GET['serverid']);
+		$serverid = mysqli_real_escape_string($conn, $_GET['serverid']);
 		###
 		if (!is_numeric($serverid))
 		{
@@ -1664,8 +1635,8 @@ switch (@$task)
 		}
 		###
 		//Adding event to the database
-		$message = 'Server Updated : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Updated : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Updating Game Server!');
 		$_SESSION['msg2'] = T_('Your game server is currently being updated. Please wait...');
@@ -1677,7 +1648,7 @@ switch (@$task)
 	case 'abortOperation':
 		require_once("../libs/gameinstaller/gameinstaller.php");
 		###
-		$serverid = mysql_real_escape_string($_GET['serverid']);
+		$serverid = mysqli_real_escape_string($conn, $_GET['serverid']);
 		###
 		if (!is_numeric($serverid))
 		{
@@ -1715,8 +1686,8 @@ switch (@$task)
 		$gameInstaller->abortOperation( 'installGame' );
 		###
 		//Adding event to the database
-		$message = 'Server Action Aborted : '.mysql_real_escape_string($server['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Server Action Aborted : '.mysqli_real_escape_string($conn, $server['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Warning: Operation Aborted!');
 		$_SESSION['msg2'] = '';
