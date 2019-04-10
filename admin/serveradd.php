@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'serveradd';
 $tab = 2;
 $return = 'serveradd.php';
@@ -42,7 +13,7 @@ $title = T_('Add New Server');
 
 $numBoxes = query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box`" );
 $numGroups = query_numrows( "SELECT `groupid` FROM `".DBPREFIX."group`" );
-$games = mysql_query( "SELECT `gameid`, `game` FROM `".DBPREFIX."game` WHERE `status` = 'Active' ORDER BY `game`" );
+$games = mysqli_query($conn, "SELECT `gameid`, `game` FROM `".DBPREFIX."game` WHERE `status` = 'Active' ORDER BY `game`" );
 
 
 //---------------------------------------------------------+
@@ -148,7 +119,7 @@ switch ($step)
 <?php
 
 //---------------------------------------------------------+
-while ($rowsGames = mysql_fetch_assoc($games))
+while ($rowsGames = mysqli_fetch_assoc($games))
 {
 ?>
 							<option value="<?php echo $rowsGames['gameid']; ?>"><?php echo htmlspecialchars($rowsGames['game'], ENT_QUOTES); ?></option>
@@ -180,11 +151,11 @@ while ($rowsGames = mysql_fetch_assoc($games))
 
 
 	case 'form':
-		$rows = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
-		$clients = mysql_query( "SELECT `clientid`, `firstname`, `lastname` FROM `".DBPREFIX."client` WHERE `status` = 'Active' ORDER BY `clientid`" );
-		$admins = mysql_query( "SELECT `adminid`, `username` FROM `".DBPREFIX."admin` WHERE `status` = 'Active' ORDER BY `adminid`" );
-		$boxes = mysql_query( "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
-		$groups = mysql_query( "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
+		$rows = query_fetch_assoc($conn, "SELECT * FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
+		$clients = mysqli_query($conn, "SELECT `clientid`, `firstname`, `lastname` FROM `".DBPREFIX."client` WHERE `status` = 'Active' ORDER BY `clientid`" );
+		$admins = mysqli_query($conn, "SELECT `adminid`, `username` FROM `".DBPREFIX."admin` WHERE `status` = 'Active' ORDER BY `adminid`" );
+		$boxes = mysqli_query($conn, "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
+		$groups = mysqli_query($conn, "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
 		###
 ?>
 			<ul class="breadcrumb">
@@ -209,7 +180,7 @@ if (isset($_SESSION['name']))
 						<select name="groupID">
 <?php
 //---------------------------------------------------------+
-while ($rowsGroups = mysql_fetch_assoc($groups))
+while ($rowsGroups = mysqli_fetch_assoc($groups))
 {
 	if (isset($_SESSION['groupid']) && $rowsGroups['groupid'] == $_SESSION['groupid'])
 	{
@@ -232,11 +203,11 @@ while ($rowsGroups = mysql_fetch_assoc($groups))
 						<select name="ipID">
 <?php
 //---------------------------------------------------------+
-while ($rowsBoxes = mysql_fetch_assoc($boxes))
+while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 {
-	$ips = mysql_query( "SELECT `ipid`, `ip` FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
+	$ips = mysqli_query($conn, "SELECT `ipid`, `ip` FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
 
-	while ($rowsIps = mysql_fetch_assoc($ips))
+	while ($rowsIps = mysqli_fetch_assoc($ips))
 	{
 		if (isset($_SESSION['ipid']) && $rowsIps['ipid'] == $_SESSION['ipid'])
 		{
