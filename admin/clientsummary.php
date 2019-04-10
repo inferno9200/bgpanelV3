@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'clientsummary';
 $tab = 1;
 $isSummary = TRUE;
@@ -58,7 +29,7 @@ if (query_numrows( "SELECT `username` FROM `".DBPREFIX."client` WHERE `clientid`
 
 
 $rows = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."client` WHERE `clientid` = '".$clientid."' LIMIT 1" );
-$logs = mysql_query( "SELECT * FROM `".DBPREFIX."log` WHERE `clientid` = '".$clientid."' ORDER BY `logid` DESC LIMIT 5" );
+$logs = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."log` WHERE `clientid` = '".$clientid."' ORDER BY `logid` DESC LIMIT 5" );
 $groups = getClientGroups($clientid);
 
 
@@ -190,7 +161,7 @@ unset($groups);
 						<table class="table table-bordered">
 <?php
 
-if (mysql_num_rows($logs) == 0)
+if (mysqli_num_rows($logs) == 0)
 {
 ?>
 							<tr>
@@ -203,7 +174,7 @@ if (mysql_num_rows($logs) == 0)
 <?php
 }
 
-while ($rowsLogs = mysql_fetch_assoc($logs))
+while ($rowsLogs = mysqli_fetch_assoc($logs))
 {
 ?>
 							<tr>
