@@ -1,32 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
 
 $title = 'Cron Job';
 $page = 'cron';
@@ -119,12 +91,12 @@ $request = "sep";                // WHAT TO PRE-CACHE: [s] = BASIC INFO [e] = SE
 
 //------------------------------------------------------------------------------------------------------------+
 
-$mysql_query  = "SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `disabled`=0 ORDER BY `cache_time` ASC";
-$mysql_result = mysql_query($mysql_query) or die(mysql_error());
+$mysqli_query  = "SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `disabled`=0 ORDER BY `cache_time` ASC";
+$mysqli_result = mysqli_query($conn, $mysqli_query) or die(mysqli_error($conn));
 
-while($mysql_row = mysql_fetch_array($mysql_result, MYSQL_ASSOC))
+while($mysqli_row = mysqli_fetch_array($mysqli_result, MYSQLI_ASSOC))
 {
-	lgsl_query_cached($mysql_row['type'], $mysql_row['ip'], $mysql_row['c_port'], $mysql_row['q_port'], $mysql_row['s_port'], $request);
+	lgsl_query_cached($mysqli_row['type'], $mysqli_row['ip'], $mysqli_row['c_port'], $mysqli_row['q_port'], $mysqli_row['s_port'], $request);
 }
 
 //------------------------------------------------------------------------------------------------------------+
@@ -138,9 +110,9 @@ $boxData = array();
 
 if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) != 0)
 {
-	$boxes = mysql_query( "SELECT `boxid`, `ip`, `login`, `password`, `sshport` FROM `".DBPREFIX."box`" );
+	$boxes = mysqli_query($conn, "SELECT `boxid`, `ip`, `login`, `password`, `sshport` FROM `".DBPREFIX."box`" );
 
-	while ($rowsBoxes = mysql_fetch_assoc($boxes))
+	while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 	{
 		$aes = new Crypt_AES();
 		$aes->setKeyLength(256);
@@ -191,7 +163,7 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 			);
 
 			query_basic( "UPDATE `".DBPREFIX."box` SET
-				`cache` = '".mysql_real_escape_string(gzcompress(serialize($boxCache), 2))."' WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
+				`cache` = '".mysqli_real_escape_string($conn, gzcompress(serialize($boxCache), 2))."' WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
 
 			unset($boxCache);
 		}
@@ -201,9 +173,9 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 			//------------------------------------------------------------------------------------------------------------+
 			//We have to clean screenlog.0 files
 
-			$servers = mysql_query( "SELECT `path` FROM `".DBPREFIX."server` WHERE `boxid` = '".$rowsBoxes['boxid']."' && `status` = 'Active'" );
+			$servers = mysqli_query($conn, "SELECT `path` FROM `".DBPREFIX."server` WHERE `boxid` = '".$rowsBoxes['boxid']."' && `status` = 'Active'" );
 
-			while ($rowsServers = mysql_fetch_assoc($servers))
+			while ($rowsServers = mysqli_fetch_assoc($servers))
 			{
 				$screenlogExists = trim($ssh->exec('cd '.dirname($rowsServers['path']).'; test -f screenlog.0 && echo "true" || echo "false";'."\n"));
 
@@ -341,9 +313,9 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 
 			$p = 0;
 
-			$servers = mysql_query( "SELECT * FROM `".DBPREFIX."server` WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
+			$servers = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."server` WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
 
-			while ($rowsServers = mysql_fetch_assoc($servers))
+			while ($rowsServers = mysqli_fetch_assoc($servers))
 			{
 				$type = query_fetch_assoc( "SELECT `querytype` FROM `".DBPREFIX."game` WHERE `gameid` = '".$rowsServers['gameid']."' LIMIT 1");
 				$serverIp = query_fetch_assoc( "SELECT `ip` FROM `".DBPREFIX."boxIp` WHERE `ipid` = '".$rowsServers['ipid']."' LIMIT 1" );
@@ -416,7 +388,7 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 			//Update DB for the current box
 
 			query_basic( "UPDATE `".DBPREFIX."box` SET
-				`cache` = '".mysql_real_escape_string(gzcompress(serialize($boxCache), 2))."' WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
+				`cache` = '".mysqli_real_escape_string($conn, gzcompress(serialize($boxCache), 2))."' WHERE `boxid` = '".$rowsBoxes['boxid']."'" );
 
 			$boxData = $boxData + $boxCache;
 
@@ -434,7 +406,7 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 
 	query_basic( "INSERT INTO `".DBPREFIX."boxData` SET
 	`timestamp` = '".time()."',
-	`cache` = '".mysql_real_escape_string(gzcompress(serialize($boxData), 2))."'" );
+	`cache` = '".mysqli_real_escape_string($conn, gzcompress(serialize($boxData), 2))."'" );
 
 	unset($boxData);
 }
@@ -450,12 +422,12 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 // Remove old data
 
 $time = time() - (60 * 60 * 24 * 7 * 4 * 3 + 3600);
-$numOldData = mysql_num_rows(mysql_query( "SELECT `id` FROM `".DBPREFIX."boxData` WHERE `timestamp` < '".$time."'" ));
+$numOldData = mysqli_num_rows(mysqli_query($conn, "SELECT `id` FROM `".DBPREFIX."boxData` WHERE `timestamp` < '".$time."'" ));
 
 if ($numOldData > 0)
 {
-	$oldData = mysql_query( "SELECT `id` FROM `".DBPREFIX."boxData` WHERE `timestamp` < '".$time."'" );
-	while ($rowsData = mysql_fetch_assoc($oldData))
+	$oldData = mysqli_query($conn, "SELECT `id` FROM `".DBPREFIX."boxData` WHERE `timestamp` < '".$time."'" );
+	while ($rowsData = mysqli_fetch_assoc($oldData))
 	{
 		query_basic( "DELETE FROM `".DBPREFIX."boxData` WHERE `id` = '".$rowsData['id']."'" );
 	}
