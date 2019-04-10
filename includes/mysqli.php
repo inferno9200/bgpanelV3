@@ -4,13 +4,13 @@ if (!defined('LICENSE'))
 {
 	exit('Access Denied');
 }
-$connection = mysql_pconnect(DBHOST, DBUSER, DBPASSWORD);	// Connection to database
-if (!$connection)	// Return error if connection is broken
+$connection = mysqli_connect(DBHOST, DBUSER, DBPASSWORD);
+if (!$connection)
 {
 	exit("<html><head></head><body><h1>Database maintenance</h1><p>Please check back later</p></body></html>");
 }
-$db_connection = mysql_select_db(DBNAME);	// Select our database
-if (!$db_connection)	// Return error	if error happened with database
+$db_connection = mysqli_select_db($conn, DBNAME);
+if (!$db_connection)
 {
 	exit("<html><head></head><body><h1>Database maintenance</h1><p>Please check back later</p></body></html>");
 }
