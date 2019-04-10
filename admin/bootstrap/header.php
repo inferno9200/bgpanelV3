@@ -1,40 +1,8 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
-//Prevent direct access
 if (!defined('LICENSE'))
 {
 	exit('Access Denied');
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="<?php
@@ -56,11 +24,9 @@ if (!defined('LICENSE'))
 			echo $title.' - '.htmlspecialchars(SITENAME, ENT_QUOTES);
 		}
 		?></title>
-		<!--Powered By Bright Game Panel-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<!-- Javascript -->
-			<script src="../bootstrap/js/jquery.js"></script>
-			<script src="../bootstrap/js/jquery.tablesorter.min.js"></script>
+		<script src="../bootstrap/js/jquery.js"></script>
+		<script src="../bootstrap/js/jquery.tablesorter.min.js"></script>
 <?php
 if (($page == 'scriptconsole') || ($page == 'utilitiesrcontool'))
 {
@@ -181,8 +147,8 @@ if ($page != 'login')
 	 */
 	if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box`" ) != 0)
 	{
-		$boxesNav = mysql_query( "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `name`" );
-		while ($rowsBoxesNav = mysql_fetch_assoc($boxesNav))
+		$boxesNav = mysqli_query($conn, "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `name`" );
+		while ($rowsBoxesNav = mysqli_fetch_assoc($conn, $boxesNav))
 		{
 ?>
 											<li class="dropdown-submenu">
@@ -195,8 +161,8 @@ if ($page != 'login')
 			 */
 			if (query_numrows( "SELECT `id` FROM `".DBPREFIX."scriptCat`" ) != 0)
 			{
-				$categoriesNav = mysql_query( "SELECT `id`, `name` FROM `".DBPREFIX."scriptCat` ORDER BY `name`" );
-				while ($rowsCategoriesNav = mysql_fetch_assoc($categoriesNav))
+				$categoriesNav = mysqli_query($conn, "SELECT `id`, `name` FROM `".DBPREFIX."scriptCat` ORDER BY `name`" );
+				while ($rowsCategoriesNav = mysqli_fetch_assoc($conn, $categoriesNav))
 				{
 ?>
 													<li class="dropdown-submenu">
@@ -208,8 +174,8 @@ if ($page != 'login')
 					 */
 					if (query_numrows( "SELECT `scriptid` FROM `".DBPREFIX."script` WHERE ( `boxid` = '".$rowsBoxesNav['boxid']."' AND `catid` = '".$rowsCategoriesNav['id']."' AND `status` = 'Active' ) " ) != 0)
 					{
-						$scriptsNav = mysql_query( "SELECT `scriptid`, `boxid`, `catid`, `name`, `panelstatus`, `type` FROM `".DBPREFIX."script` WHERE ( `boxid` = '".$rowsBoxesNav['boxid']."' AND `catid` = '".$rowsCategoriesNav['id']."' AND `status` = 'Active' ) ORDER BY `name`" );
-						while ($rowsScriptsNav = mysql_fetch_assoc($scriptsNav))
+						$scriptsNav = mysqli_query($conn, "SELECT `scriptid`, `boxid`, `catid`, `name`, `panelstatus`, `type` FROM `".DBPREFIX."script` WHERE ( `boxid` = '".$rowsBoxesNav['boxid']."' AND `catid` = '".$rowsCategoriesNav['id']."' AND `status` = 'Active' ) ORDER BY `name`" );
+						while ($rowsScriptsNav = mysqli_fetch_assoc($conn, $scriptsNav))
 						{
 							if ($rowsScriptsNav['type'] == '0')
 							{
