@@ -1,35 +1,5 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
-
 
 require("../configuration.php");
 require("./include.php");
@@ -37,26 +7,26 @@ require("./include.php");
 
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
 
 
 switch (@$task)
 {
 	case 'clientadd':
-		$username = mysql_real_escape_string($_POST['username']);
-		$password = mysql_real_escape_string($_POST['password']);
-		$firstname = mysql_real_escape_string($_POST['firstname']);
+		$username = mysqli_real_escape_string($conn, $_POST['username']);
+		$password = mysqli_real_escape_string($conn, $_POST['password']);
+		$firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
 		$firstname = ucwords($firstname); //Format the first name as a proper noun
-		$lastname = mysql_real_escape_string($_POST['lastname']);
+		$lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
 		$lastname = ucwords($lastname); //Format the last name as a proper noun
-		$email = mysql_real_escape_string($_POST['email']);
+		$email = mysqli_real_escape_string($conn, $_POST['email']);
 		$email = strtolower($email); //Format the email to lower case
-		$notes = mysql_real_escape_string($_POST['notes']);
+		$notes = mysqli_real_escape_string($conn, $_POST['notes']);
 		if (isset($_POST['sendemail'])) {
 			$sendemail = 'on';
 		} else {
@@ -122,7 +92,7 @@ switch (@$task)
 		$password2 = $password; //Temp var for the email
 		$salt = hash('sha512', $username); //Salt
 		$password = hash('sha512', $salt.$password); //Hashed password with salt
-		query_basic( "INSERT INTO `".DBPREFIX."client` SET
+		$sql = ( "INSERT INTO `".DBPREFIX."client` SET
 			`username` = '".$username."',
 			`password` = '".$password."',
 			`firstname` = '".$firstname."',
@@ -130,7 +100,7 @@ switch (@$task)
 			`email` = '".$email."',
 			`notes` = '".$notes."',
 			`status` = 'Active',
-			`lang` = '".DEFAULT_LOCALE."',
+			`lang` = 'en_EN',
 			`lastlogin` = '0000-00-00 00:00:00',
 			`lastactivity` = '0',
 			`lastip` = '~',
@@ -139,9 +109,10 @@ switch (@$task)
 			`token`= ''" );
 		###
 		//Adding event to the database
-		$clientid = mysql_insert_id();
+		mysqli_query($conn, $sql); // it has to be executed here otherwise $mysqli_insert_id isn't working! #fix_later
+		$clientid = mysqli_insert_id($conn);
 		$message = "New Client Added: ".$username;
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		if ($sendemail == 'on')
 		{
@@ -169,20 +140,20 @@ switch (@$task)
 		$_SESSION['msg1'] = T_('Client Added Successfully!');
 		$_SESSION['msg2'] = T_('The new client account has been added and is ready for use.');
 		$_SESSION['msg-type'] = 'success';
-		header( "Location: clientsummary.php?id=".urlencode($clientid) );
+		header( "Location: clientsummary.php?id=".urlencode($clientid));
 		die();
 		break;
 
 	case 'clientprofile':
-		$clientid = mysql_real_escape_string($_POST['clientid']);
-		$username = mysql_real_escape_string($_POST['username']);
-		$password = mysql_real_escape_string($_POST['password']);
-		$status = mysql_real_escape_string($_POST['status']);
-		$firstname = mysql_real_escape_string($_POST['firstname']);
+		$clientid = mysqli_real_escape_string($conn, $_POST['clientid']);
+		$username = mysqli_real_escape_string($conn, $_POST['username']);
+		$password = mysqli_real_escape_string($conn, $_POST['password']);
+		$status = mysqli_real_escape_string($conn, $_POST['status']);
+		$firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
 		$firstname = ucwords($firstname); //Format the first name as a proper noun
-		$lastname = mysql_real_escape_string($_POST['lastname']);
+		$lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
 		$lastname = ucwords($lastname); //Format the last name as a proper noun
-		$email = mysql_real_escape_string($_POST['email']);
+		$email = mysqli_real_escape_string($conn, $_POST['email']);
 		$email = strtolower($email); //Format the email to lower case
 		if (isset($_POST['sendemail']))	{
 			$sendemail = 'on';
@@ -257,7 +228,7 @@ switch (@$task)
 		###
 		//Adding event to the database
 		$message = "Client Edited: ".$username." (by Admin)";
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		if ( ($sendemail == 'on') && (!empty($password) ) )
 		{
@@ -321,8 +292,8 @@ switch (@$task)
 		query_basic( "DELETE FROM `".DBPREFIX."groupMember` WHERE `clientid` = '".$clientid."' LIMIT 1" );
 		###
 		//Adding event to the database
-		$message = 'Client Deleted: '.mysql_real_escape_string($username['username']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Client Deleted: '.mysqli_real_escape_string($conn, $username['username']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Client Deleted Successfully!');
 		$_SESSION['msg2'] = T_('The selected client has been removed.');
