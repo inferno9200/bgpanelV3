@@ -1,33 +1,7 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
+error_reporting(E_ALL);
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
 if (!is_file('../configuration.php'))
 {
 	exit('<html><body><h1>Configuration file not found !</h1></body></html>');
@@ -37,21 +11,8 @@ else
 	require('../configuration.php');
 }
 
-//---------------------------------------------------------+
-
-/**
- * Install Wizard Version
- */
 define('WIZARDVERSION', 'v1.7.0');
-
-/**
- * BGP VERSION LIST
- */
 require('./inc/versions.php');
-
-/**
- * SQL FUNCTIONS
- */
 require('./inc/mysql.php');
 
 //---------------------------------------------------------+
@@ -72,7 +33,7 @@ switch (@$task)
 				die();
 			}
 		}
-		exit( "You must accept the terms of the license agreement." );
+		exit( "Make sure you've check the notes!" );
 		break;
 
 	default:
@@ -84,40 +45,18 @@ switch (@$task)
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Install and Update Script - BrightGamePanel</title>
-		<!--Powered By Bright Game Panel-->
+		<title>Installation Script</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<!-- JS -->
 			<script src="./bootstrap/js/jquery.js"></script>
 			<script src="./bootstrap/js/bootstrap.js"></script>
-		<!-- Style -->
 			<link href="./bootstrap/css/bootstrap.css" rel="stylesheet">
-			<style type="text/css">
-			body {
-				padding-top: 60px;
-				padding-bottom: 40px;
-			}
-			</style>
 			<link href="./bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-			<!--[if lt IE 9]>
-			  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-			<![endif]-->
-		<!-- Favicon -->
 			<link rel="shortcut icon" href="./bootstrap/img/favicon.ico">
 	</head>
-
 	<body>
-			<div class="navbar navbar-fixed-top">
-				<div class="navbar-inner">
-					<div class="container-fluid">
-						<a class="brand" href="#">Bright Game Panel</a>
-					</div>
-				</div>
-			</div>
 			<div class="container">
 				<div class="page-header">
-					<h1>Install and Update Script&nbsp;<small>Bright Game Panel <?php echo LASTBGPVERSION; ?></small></h1>
+					<h1><center>Installation Script BGP V3</center></h1>
 				</div>
 				<ul class="breadcrumb">
 <?php
@@ -127,14 +66,14 @@ switch (@$task)
 if (!isset($_GET['step'])) // Step == 'zero'
 {
 ?>
-					<li class="active">License</li>
+					<li class="active">Notes & Readme</li>
 <?php
 }
 else if ($_GET['step'] == 'one')
 {
 ?>
 					<li>
-						<a href="index.php">License</a> <span class="divider">/</span>
+						<a href="index.php">Notes & Readme</a> <span class="divider">/</span>
 					</li>
 					<li class="active">Check Requirements</li>
 <?php
@@ -143,7 +82,7 @@ else if ($_GET['step'] == 'two')
 {
 ?>
 					<li>
-						<a href="index.php">License</a> <span class="divider">/</span>
+						<a href="index.php">Notes & Readme</a> <span class="divider">/</span>
 					</li>
 					<li>
 						<a href="index.php?step=one">Check Requirements</a> <span class="divider">/</span>
@@ -155,7 +94,7 @@ else if ($_GET['step'] == 'three')
 {
 ?>
 					<li>
-						<a href="index.php">License</a> <span class="divider">/</span>
+						<a href="index.php">Notes & Readme</a> <span class="divider">/</span>
 					</li>
 					<li>
 						<a href="index.php?step=one">Check Requirements</a> <span class="divider">/</span>
@@ -173,20 +112,15 @@ else if ($_GET['step'] == 'three')
 				</ul>
 <?php
 
-
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-
-
-if (!isset($_GET['step'])) // Step == 'zero'
+if (!isset($_GET['step']))
 {
 ?>
 				<div class="well">
 					<div style="width:auto;height:480px;overflow:scroll;overflow-y:scroll;overflow-x:hidden;">
 <?php
-	$license = fopen('../gpl-3.0.txt', 'r');
+	$license = fopen('../README.md', 'r');
 
 	while ($rows = fgets($license))
 	{
@@ -200,34 +134,12 @@ if (!isset($_GET['step'])) // Step == 'zero'
 				<form method="post" action="index.php">
 					<input type="hidden" name="task" value="license" />
 					<label class="checkbox">
-						<input type="checkbox" name="license">&nbsp;I Accept the Terms of the License Agreement
+						<input type="checkbox" name="license">&nbsp;I have read all notes.
 					</label>
 					<div style="text-align: center; margin-top: 19px;">
 						<button type="submit" class="btn">Submit</button>
 					</div>
 				</form>
-				<div class="modal fade" id="welcome">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h3>BrightGamePanel Install and Update Script</h3>
-					</div>
-					<div class="modal-body">
-						<p class="lead">
-							Welcome to BrightGamePanel,<br />
-							a easy to use and powerful game control panel.
-						</p>
-						<br /><br />
-						<small>Click on the button below to start the installation process.</small>
-					</div>
-					<div class="modal-footer">
-						<a class="btn btn-primary" data-dismiss="modal" href="#">Go !</a>
-					</div>
-				</div>
-				<script type="text/javascript">
-				$(document).ready(function() {
-					$('#welcome').modal('show')
-				});
-				</script>
 <?php
 }
 
@@ -257,14 +169,14 @@ else if ($_GET['step'] == 'one')
 						</tr>
 <?php
 
-	$versioncompare = version_compare(PHP_VERSION, '5.3.4');
+	$versioncompare = version_compare(PHP_VERSION, '5.6');
 	if ($versioncompare == -1)
 	{
 ?>
 						<tr class="error">
 							<td>Checking your version of PHP</td>
 							<td><span class="label label-important">FAILED (<?php echo PHP_VERSION; ?>)</span></td>
-							<td>Upgrade to PHP 5.3.4 or greater</td>
+							<td>Upgrade to PHP 7.0</td>
 						</tr>
 <?php
 		$error = TRUE;
@@ -309,7 +221,7 @@ else if ($_GET['step'] == 'one')
 ?>
 <?php
 
-	if (!extension_loaded('mysql'))
+	if (!extension_loaded('mysqli'))
 	{
 ?>
 						<tr class="error">
@@ -330,14 +242,14 @@ else if ($_GET['step'] == 'one')
 						</tr>
 <?php
 
-		$mysql_link = @mysql_connect(DBHOST,DBUSER,DBPASSWORD);
+		$mysql_link = mysqli_connect(DBHOST, DBUSER, DBPASSWORD, DBNAME);
 		if ($mysql_link == FALSE)
 		{
 ?>
 						<tr class="error">
 							<td>Checking for MySQL server connection</td>
 							<td><span class="label label-important">FAILED</span></td>
-							<td>Could not connect to MySQL: "<?php echo mysql_error(); ?>"</td>
+							<td>Could not connect to MySQL: "<?php echo mysqli_error($conn); ?>"</td>
 						</tr>
 <?php
 			$error = TRUE;
@@ -350,31 +262,9 @@ else if ($_GET['step'] == 'one')
 							<td><span class="label label-success">SUCCESSFUL</span></td>
 							<td></td>
 						</tr>
-<?php
 
-			$mysql_database_link = @mysql_select_db(DBNAME);
-			if ($mysql_database_link == FALSE)
-			{
-?>
-						<tr class="error">
-							<td>Checking for MySQL database</td>
-							<td><span class="label label-important">FAILED</span></td>
-							<td>Could not connect to MySQL database: "<?php echo mysql_error(); ?>"</td>
-						</tr>
 <?php
-				$error = TRUE;
-			}
-			else
-			{
-?>
-						<tr class="success">
-							<td>Checking for MySQL database</td>
-							<td><span class="label label-success">SUCCESSFUL</span></td>
-							<td></td>
-						</tr>
-<?php
-			}
-			mysql_close($mysql_link);
+			mysqli_close($mysql_link);
 		}
 	}
 
@@ -676,35 +566,36 @@ else if ($_GET['step'] == 'two')
 				<h2>Checking for existing databases . . . . .</h2>
 <?php
 
-	$mysql_link = @mysql_connect(DBHOST,DBUSER,DBPASSWORD);
+	$mysql_link = @mysqli_connect(DBHOST,DBUSER,DBPASSWORD);
 	if (!$mysql_link)
 	{
-		exit('Could not connect to MySQL: '.mysql_error());
+		exit('Could not connect to MySQL: '.mysqli_error($conn));
 	}
 	else
 	{
-		$mysql_database_link = mysql_select_db(DBNAME);
+		$mysql_database_link = mysqli_select_db($nodb, DBNAME);
 		if ($mysql_database_link == FALSE)
 		{
-			exit('Could not connect to MySQL database: '.mysql_error());
+			exit('Could not connect to MySQL database: '.mysqli_error($conn));
 		}
 		else
 		{
-			$tables = mysql_query('SHOW TABLES');
-			$rowsTables = mysql_fetch_array($tables);
+			$tables = mysqli_query($conn, 'SHOW TABLES');
+			$rowsTables = mysqli_fetch_array($tables);
 
 			if (!empty($rowsTables))
 			{
-				while ($rowsTables = mysql_fetch_array($tables))
+				while ($rowsTables = mysqli_fetch_array($tables))
 				{
 					if ($rowsTables[0] == DBPREFIX.'config')
 					{
-						$currentVersion = mysql_fetch_assoc(mysql_query( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" ));
+						$currentVersion = mysqli_fetch_assoc(mysqli_query($conn, "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" ));
 					}
 				}
 			}
 
-			mysql_close($mysql_link);
+			mysqli_close($mysql_link);
+			mysqli_close($conn);
 		}
 	}
 
@@ -733,8 +624,8 @@ else if ($_GET['step'] == 'two')
 				<span class="label label-success">No tables found in the database</span><br /><br />
 				<form action="index.php" method="get">
 					<input type="hidden" name="step" value="three" />
-					<input name="version" type="radio" value="full" checked="checked" /><b>&nbsp;Install BGP Version <?php echo LASTBGPVERSION; ?></b><br /><br />
-					<button type="submit" class="btn btn-primary">Install MySQL Database</button>
+					<input name="version" type="radio" value="full" checked="checked" /><b> BGP V3</b><br /><br />
+					<button type="submit" class="btn btn-primary"> INSTALL </button>
 				</form>
 				</div>
 <?php
@@ -784,22 +675,22 @@ else if ($_GET['step'] == 'three')
 
 		case 'update':
 
-			$mysql_link = mysql_connect(DBHOST,DBUSER,DBPASSWORD);
+			$mysql_link = mysqli_connect(DBHOST,DBUSER,DBPASSWORD);
 			if (!$mysql_link)
 			{
-				exit(mysql_error());
+				exit(mysqli_error($conn));
 			}
 			else
 			{
-				$mysql_database_link = mysql_select_db(DBNAME);
+				$mysql_database_link = mysqli_select_db($nodb, DBNAME);
 				if ($mysql_database_link == FALSE)
 				{
 					echo "Could not connect to MySQL database";
 				}
 				else
 				{
-					$currentVersion = mysql_fetch_assoc(mysql_query( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" ));
-					mysql_close($mysql_link);
+					$currentVersion = mysqli_fetch_assoc(mysqli_query($conn, "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" ));
+					mysqli_close($mysql_link);
 				}
 			}
 
@@ -833,22 +724,22 @@ else if ($_GET['step'] == 'three')
 
 			//---------------------------------------------------------+
 
-			$mysql_link = mysql_connect(DBHOST,DBUSER,DBPASSWORD);
+			$mysql_link = mysqli_connect(DBHOST,DBUSER,DBPASSWORD);
 			if (!$mysql_link)
 			{
-				exit(mysql_error());
+				exit(mysqli_error($conn));
 			}
 			else
 			{
-				$mysql_database_link = mysql_select_db(DBNAME);
+				$mysql_database_link = mysqli_select_db($nodb, DBNAME);
 				if ($mysql_database_link == FALSE)
 				{
 					echo "Could not connect to MySQL database";
 				}
 				else
 				{
-					$currentVersion = mysql_fetch_assoc(mysql_query( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" ));
-					mysql_close($mysql_link);
+					$currentVersion = mysqli_fetch_assoc(mysqli_query($conn, "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" ));
+					mysqli_close($mysql_link);
 				}
 			}
 
@@ -898,14 +789,6 @@ else if ($_GET['step'] == 'three')
 				<legend>Changelog:</legend>
 				<div style="width:auto;height:480px;overflow:scroll;overflow-y:scroll;overflow-x:hidden;">
 <?php
-		$log = fopen('CHANGELOG.txt', 'r');
-
-		while ($rows = fgets($log))
-		{
-			echo $rows.'<br />';
-		}
-
-		fclose($log);
 ?>
 				</div>
 				<hr>
@@ -914,34 +797,12 @@ else if ($_GET['step'] == 'three')
 	}
 ?>
 				<hr>
-				<h1>Thanks for using Bright Game Panel :-)</h1>
+				<h1>Thanks for using BGP V3 :-)</h1>
 				</div>
 <?php
 }
-
-
-
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-
-
 ?>
 				<hr>
-				<footer>
-					<div class="pull-left">
-						Copyleft - 2013. Released Under <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GPLv3</a>.<br />
-						All Images Are Copyrighted By Their Respective Owners.
-					</div>
-					<div class="pull-right" style="text-align: right;">
-						<a href="http://www.bgpanel.net/" target="_blank">Bright Game Panel</a><br />
-						Install Script: <?php echo WIZARDVERSION; ?> - BGP: <?php echo LASTBGPVERSION; ?><br />
-						Built with <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a>.
-					</div>
-				</footer>
-			</div><!--/container-->
-
-			<!--Powered By Bright Game Panel-->
-
 	</body>
 </html>
