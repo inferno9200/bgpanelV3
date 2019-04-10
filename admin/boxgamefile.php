@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'boxgamefile';
 $tab = 3;
 $isSummary = TRUE;
@@ -61,7 +32,7 @@ if (query_numrows( "SELECT `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$box
 
 
 $rows = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
-$games = mysql_query( "SELECT * FROM `".DBPREFIX."game` ORDER BY `game`" );
+$games = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."game` ORDER BY `game`" );
 
 $aes = new Crypt_AES();
 $aes->setKeyLength(256);
@@ -114,7 +85,7 @@ include("./bootstrap/notifications.php");
 					<tbody>
 <?php
 
-while ($rowsGames = mysql_fetch_assoc($games))
+while ($rowsGames = mysqli_fetch_assoc($games))
 {
 	$repoCacheInfo =	$gameInstaller->getCacheInfo( $rowsGames['cachedir'] );
 	$gameExists =		$gameInstaller->gameExists( $rowsGames['game'] );
@@ -212,7 +183,7 @@ while ($rowsGames = mysql_fetch_assoc($games))
 				</table>
 <?php
 
-if (mysql_num_rows($games) != 0)
+if (mysqli_num_rows($games) != 0)
 {
 ?>
 				<script type="text/javascript">
@@ -229,7 +200,6 @@ if (mysql_num_rows($games) != 0)
 						sortList: [[0,0]]
 					});
 				});
-				<!-- -->
 				function doRepoAction(boxid, gameid, task, action, game)
 				{
 					if (confirm('<?php echo T_('Are you sure you want to'); ?> '+action+' '+game+' ?'))
