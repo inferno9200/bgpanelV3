@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'index';
 $tab = 0;
 $return = 'index.php';
@@ -45,22 +16,22 @@ $rows = query_fetch_assoc( "SELECT `adminid`, `notes` FROM `".DBPREFIX."admin` W
 //---------------------------------------------------------+
 //Online Users :
 $unixLastMin = time() - 1 * 60;
-$onlineClients = mysql_query( "SELECT `clientid`, `username` FROM `".DBPREFIX."client` WHERE `lastactivity` >= '".$unixLastMin."'" ); //We select all clients active in the last minute (based on unix timestamp)
-$onlineAdmins = mysql_query( "SELECT `adminid`, `username` FROM `".DBPREFIX."admin` WHERE `lastactivity` >= '".$unixLastMin."'" ); //Same 4 admins
+$onlineClients = mysqli_query($conn, "SELECT `clientid`, `username` FROM `".DBPREFIX."client` WHERE `lastactivity` >= '".$unixLastMin."'" ); //We select all clients active in the last minute (based on unix timestamp)
+$onlineAdmins = mysqli_query($conn, "SELECT `adminid`, `username` FROM `".DBPREFIX."admin` WHERE `lastactivity` >= '".$unixLastMin."'" ); //Same 4 admins
 unset($unixLastMin);
 
 //---------------------------------------------------------+
 //Servers :
-$servers = mysql_query( "SELECT * FROM `".DBPREFIX."server` WHERE `status` = 'Active' && `panelstatus` = 'Started' ORDER BY `name`" );
+$servers = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."server` WHERE `status` = 'Active' && `panelstatus` = 'Started' ORDER BY `name`" );
 
 //---------------------------------------------------------+
 //Boxes :
-$boxes = mysql_query( "SELECT `boxid`, `name`, `cache` FROM `".DBPREFIX."box` ORDER BY `name`" );
+$boxes = mysqli_query($conn, "SELECT `boxid`, `name`, `cache` FROM `".DBPREFIX."box` ORDER BY `name`" );
 $cron = query_fetch_assoc( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'lastcronrun' LIMIT 1" );
 
 //---------------------------------------------------------+
 //Last 15 Actions :
-$logs = mysql_query( "SELECT * FROM `".DBPREFIX."log` ORDER BY `logid` DESC LIMIT 15" );
+$logs = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."log` ORDER BY `logid` DESC LIMIT 15" );
 
 
 include("./bootstrap/header.php");
@@ -191,7 +162,7 @@ else
 								<tbody>
 <?php
 
-while ($rowsonlineClients = mysql_fetch_assoc($onlineClients))
+while ($rowsonlineClients = mysqli_fetch_assoc($onlineClients))
 {
 ?>
 									<tr>
@@ -202,7 +173,7 @@ while ($rowsonlineClients = mysql_fetch_assoc($onlineClients))
 }
 unset($onlineClients);
 
-while ($rowsonlineAdmins = mysql_fetch_assoc($onlineAdmins))
+while ($rowsonlineAdmins = mysqli_fetch_assoc($onlineAdmins))
 {
 ?>
 									<tr>
@@ -248,7 +219,7 @@ unset($onlineAdmins);
 								<tbody>
 <?php
 
-while ($rowsServers = mysql_fetch_assoc($servers))
+while ($rowsServers = mysqli_fetch_assoc($servers))
 {
 	$serverIp = query_fetch_assoc( "SELECT `ip` FROM `".DBPREFIX."boxIp` WHERE `ipid` = '".$rowsServers['ipid']."' LIMIT 1" );
 	$type = query_fetch_assoc( "SELECT `querytype` FROM `".DBPREFIX."game` WHERE `gameid` = '".$rowsServers['gameid']."' LIMIT 1");
@@ -306,7 +277,7 @@ unset($servers);
  * BOXES
  */
 
-while ($rowsBoxes = mysql_fetch_assoc($boxes))
+while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 {
 	$cache = unserialize(gzuncompress($rowsBoxes['cache']));
 ?>
@@ -374,7 +345,7 @@ unset($cron);
 								<tbody>
 <?php
 
-if (mysql_num_rows($logs) == 0)
+if (mysqli_num_rows($logs) == 0)
 {
 ?>
 									<tr>
@@ -382,7 +353,7 @@ if (mysql_num_rows($logs) == 0)
 									</tr>
 <?php
 }
-while ($rowsLogs = mysql_fetch_assoc($logs))
+while ($rowsLogs = mysqli_fetch_assoc($logs))
 {
 ?>
 									<tr>
@@ -400,7 +371,7 @@ while ($rowsLogs = mysql_fetch_assoc($logs))
 							</table>
 <?php
 
-if (mysql_num_rows($logs) != 0)
+if (mysqli_num_rows($logs) != 0)
 {
 ?>
 							<script type="text/javascript">
