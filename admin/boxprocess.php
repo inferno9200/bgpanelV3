@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
 
 
@@ -39,24 +10,24 @@ require_once("../libs/phpseclib/Crypt/AES.php");
 
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
 
 
 switch (@$task)
 {
 	case 'boxadd':
-		$name = mysql_real_escape_string($_POST['name']);
-		$ip = mysql_real_escape_string($_POST['ip']);
-		$login = mysql_real_escape_string($_POST['login']);
-		$password = mysql_real_escape_string($_POST['password']);
-		$password2 = mysql_real_escape_string($_POST['password2']);
-		$sshport = mysql_real_escape_string($_POST['sshport']);
-		$notes = mysql_real_escape_string($_POST['notes']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$ip = mysqli_real_escape_string($conn, $_POST['ip']);
+		$login = mysqli_real_escape_string($conn, $_POST['login']);
+		$password = mysqli_real_escape_string($conn, $_POST['password']);
+		$password2 = mysqli_real_escape_string($conn, $_POST['password2']);
+		$sshport = mysqli_real_escape_string($conn, $_POST['sshport']);
+		$notes = mysqli_real_escape_string($conn, $_POST['notes']);
 		if (isset($_POST['verify'])) {
 			$verify = 'on';
 		} else {
@@ -148,15 +119,16 @@ switch (@$task)
 		$aes = new Crypt_AES();
 		$aes->setKeyLength(256);
 		$aes->setKey(CRYPT_KEY);
-		query_basic( "INSERT INTO `".DBPREFIX."box` SET
+		$sql = ( "INSERT INTO `".DBPREFIX."box` SET
 			`name` = '".$name."',
 			`ip` = '".$ip."',
 			`login` = '".$login."',
-			`password` = '".mysql_real_escape_string($aes->encrypt($password))."',
+			`password` = '".mysqli_real_escape_string($conn, $aes->encrypt($password))."',
 			`sshport` = '".$sshport."',
 			`notes` = '".$notes."'" );
 		###
-		$boxid = mysql_insert_id();
+		mysqli_query($conn, $sql); // it has to be executed here otherwise $mysqli_insert_id isn't working! #fix_later
+		$boxid = mysqli_insert_id($conn);
 		###
 		// Check if the password has been correctly stored
 		$boxPasswd = query_fetch_assoc( "SELECT `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
@@ -212,11 +184,11 @@ switch (@$task)
 									 'usage' => 0)
 			)
 		);
-		query_basic( "UPDATE `".DBPREFIX."box` SET `cache` = '".mysql_real_escape_string(gzcompress(serialize($boxCache), 2))."' WHERE `boxid` = '".$boxid."'" );
+		query_basic( "UPDATE `".DBPREFIX."box` SET `cache` = '".mysqli_real_escape_string($conn, gzcompress(serialize($boxCache), 2))."' WHERE `boxid` = '".$boxid."'" );
 		###
 		//Adding event to the database
 		$message = "Box Added: ".$name;
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Box Added Successfully!');
 		$_SESSION['msg2'] = T_('The box has been added and is ready for use.');
@@ -226,13 +198,13 @@ switch (@$task)
 		break;
 
 	case 'boxprofile':
-		$boxid = mysql_real_escape_string($_POST['boxid']);
-		$name = mysql_real_escape_string($_POST['name']);
-		$ip = mysql_real_escape_string($_POST['ip']);
-		$login = mysql_real_escape_string($_POST['login']);
-		$password = mysql_real_escape_string($_POST['password']);
-		$sshport = mysql_real_escape_string($_POST['sshport']);
-		$notes = mysql_real_escape_string($_POST['notes']);
+		$boxid = mysqli_real_escape_string($conn, $_POST['boxid']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$ip = mysqli_real_escape_string($conn, $_POST['ip']);
+		$login = mysqli_real_escape_string($conn, $_POST['login']);
+		$password = mysqli_real_escape_string($conn, $_POST['password']);
+		$sshport = mysqli_real_escape_string($conn, $_POST['sshport']);
+		$notes = mysqli_real_escape_string($conn, $_POST['notes']);
 		if (isset($_POST['verify'])) {
 			$verify = 'on';
 		} else {
@@ -343,14 +315,14 @@ switch (@$task)
 		  `name` = '".$name."',
 		  `ip` = '".$ip."',
 		  `login` = '".$login."',
-		  `password` = '".mysql_real_escape_string($password)."',
+		  `password` = '".mysqli_real_escape_string($conn, $password)."',
 		  `sshport` = '".$sshport."',
 		  `notes` = '".$notes."' WHERE `boxid` = '".$boxid."'" );
 
 		// Check if the password has been correctly stored
 		$boxPasswd = query_fetch_assoc( "SELECT `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 		if ( $aes->decrypt($boxPasswd['password']) != $aes->decrypt($password) ) {
-			query_basic( "UPDATE `".DBPREFIX."box` SET `login` = '".mysql_real_escape_string($oldAuth['login'])."', `password` = '".mysql_real_escape_string($oldAuth['password'])."' WHERE `boxid` = '".$boxid."'" );
+			query_basic( "UPDATE `".DBPREFIX."box` SET `login` = '".mysqli_real_escape_string($conn, $oldAuth['login'])."', `password` = '".mysqli_real_escape_string($conn, $oldAuth['password'])."' WHERE `boxid` = '".$boxid."'" );
 
 			$_SESSION['msg1'] = T_('Malformed Box Password!');
 			$_SESSION['msg2'] = T_('The password stored in your MySQL Database for this box is corrupted. Old password kept...');
@@ -363,7 +335,7 @@ switch (@$task)
 
 		//Adding event to the database
 		$message = "Box Edited: ".$name;
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Box Updated Successfully!');
 		$_SESSION['msg2'] = T_('Your changes to the box have been saved.');
@@ -373,8 +345,8 @@ switch (@$task)
 		break;
 
 	case 'boxnotes':
-		$boxid = mysql_real_escape_string($_POST['boxid']);
-		$notes = mysql_real_escape_string($_POST['notes']);
+		$boxid = mysqli_real_escape_string($conn, $_POST['boxid']);
+		$notes = mysqli_real_escape_string($conn, $_POST['notes']);
 		###
 		$error = '';
 		###
@@ -444,9 +416,9 @@ switch (@$task)
 		query_basic( "DELETE FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$boxid."'" );
 		###
 		//Adding event to the database
-		$message = 'Box Deleted: '.mysql_real_escape_string($rows['name']);
+		$message = 'Box Deleted: '.mysqli_real_escape_string($conn, $rows['name']);
 		###
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Box Deleted Successfully!');
 		$_SESSION['msg2'] = T_('The selected box has been removed.');
@@ -459,8 +431,8 @@ switch (@$task)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 	case 'boxipedit':
-		$boxid = mysql_real_escape_string($_POST['boxid']);
-		$newip = mysql_real_escape_string($_POST['newip']);
+		$boxid = mysqli_real_escape_string($conn, $_POST['boxid']);
+		$newip = mysqli_real_escape_string($conn, $_POST['newip']);
 		###
 		// New IP Verify
 		if (isset($_POST['verify'])) {
@@ -470,8 +442,8 @@ switch (@$task)
 		}
 		###
 		// Get IPs for Removal
-		$ips = mysql_query( "SELECT `ipid` FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$boxid."' ORDER BY `ipid`" );
-		while ($rowsIps = mysql_fetch_assoc($ips)) {
+		$ips = mysqli_query($conn, "SELECT `ipid` FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$boxid."' ORDER BY `ipid`" );
+		while ($rowsIps = mysqli_fetch_assoc($ips)) {
 			$removeValue = 'removeid' . $rowsIps['ipid'];
 			if ( isset($_POST[$removeValue]) && $_POST[$removeValue] == 'on' ) {
 				$removeids[] = $rowsIps['ipid'];
@@ -533,7 +505,7 @@ switch (@$task)
 		if (!empty($newip))
 		{
 			//Check SSH2 connection if specified
-			list($sshport, $login, $password) = mysql_fetch_array(mysql_query( "SELECT `sshport`, `login`, `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" ));
+			list($sshport, $login, $password) = mysqli_fetch_array(mysqli_query($conn, "SELECT `sshport`, `login`, `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" ));
 			$aes = new Crypt_AES();
 			$aes->setKeyLength(256);
 			$aes->setKey(CRYPT_KEY);
@@ -580,8 +552,8 @@ switch (@$task)
 	case 'makeRepo':
 		require_once("../libs/gameinstaller/gameinstaller.php");
 		###
-		$boxid = mysql_real_escape_string($_GET['boxid']);
-		$gameid = mysql_real_escape_string($_GET['gameid']);
+		$boxid = mysqli_real_escape_string($conn, $_GET['boxid']);
+		$gameid = mysqli_real_escape_string($conn, $_GET['gameid']);
 		###
 		if (!is_numeric($boxid))
 		{
@@ -654,8 +626,8 @@ switch (@$task)
 		}
 		###
 		//Adding event to the database
-		$message = "Repository Created for ".mysql_real_escape_string( $game['game'] )." on ".mysql_real_escape_string( $box['name'] );
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = "Repository Created for ".mysqli_real_escape_string($conn, $game['game'] )." on ".mysqli_real_escape_string($conn, $box['name'] );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Making Game Cache Repository!');
 		$_SESSION['msg2'] = T_('Your game cache repository is currently being created. Please wait...');
@@ -667,8 +639,8 @@ switch (@$task)
 	case 'abortOperation':
 		require_once("../libs/gameinstaller/gameinstaller.php");
 		###
-		$boxid = mysql_real_escape_string($_GET['boxid']);
-		$gameid = mysql_real_escape_string($_GET['gameid']);
+		$boxid = mysqli_real_escape_string($conn, $_GET['boxid']);
+		$gameid = mysqli_real_escape_string($conn, $_GET['gameid']);
 		###
 		if (!is_numeric($boxid))
 		{
@@ -711,8 +683,8 @@ switch (@$task)
 		$gameInstaller->abortOperation( 'makeRepo' );
 		###
 		//Adding event to the database
-		$message = "Operation Aborted for ".mysql_real_escape_string( $game['game'] )." on ".mysql_real_escape_string( $box['name'] );
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = "Operation Aborted for ".mysqli_real_escape_string($conn, $game['game'] )." on ".mysqli_real_escape_string($conn, $box['name'] );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Warning: Operation Aborted!');
 		$_SESSION['msg2'] = '';
@@ -724,8 +696,8 @@ switch (@$task)
 	case 'deleteRepo':
 		require_once("../libs/gameinstaller/gameinstaller.php");
 		###
-		$boxid = mysql_real_escape_string($_GET['boxid']);
-		$gameid = mysql_real_escape_string($_GET['gameid']);
+		$boxid = mysqli_real_escape_string($conn, $_GET['boxid']);
+		$gameid = mysqli_real_escape_string($conn, $_GET['gameid']);
 		###
 		if (!is_numeric($boxid))
 		{
@@ -778,8 +750,8 @@ switch (@$task)
 		$gameInstaller->deleteRepo( );
 		###
 		//Adding event to the database
-		$message = "Repository Deleted for ".mysql_real_escape_string( $game['game'] )." on ".mysql_real_escape_string( $box['name'] );
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = "Repository Deleted for ".mysqli_real_escape_string($conn, $game['game'] )." on ".mysqli_real_escape_string($conn, $box['name'] );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `boxid` = '".$boxid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Warning: Repository Deleted!');
 		$_SESSION['msg2'] = T_('Repository files are under deletion.');
