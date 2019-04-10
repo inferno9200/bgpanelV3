@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $page = 'box';
 $tab = 3;
 $return = 'box.php';
@@ -41,7 +12,7 @@ $title = T_('Boxes');
 
 
 $cron = query_fetch_assoc( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'lastcronrun' LIMIT 1" );
-$boxes = mysql_query( "SELECT `boxid`, `name`, `ip`, `sshport`, `cache` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
+$boxes = mysqli_query($conn, "SELECT `boxid`, `name`, `ip`, `sshport`, `cache` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
 
 
 include("./bootstrap/header.php");
@@ -79,7 +50,7 @@ include("./bootstrap/notifications.php");
 					<tbody>
 <?php
 
-if (mysql_num_rows($boxes) == 0)
+if (mysqli_num_rows($boxes) == 0)
 {
 ?>
 						<tr>
@@ -88,7 +59,7 @@ if (mysql_num_rows($boxes) == 0)
 <?php
 }
 
-while ($rowsBoxes = mysql_fetch_assoc($boxes))
+while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 {
 	$cache = unserialize(gzuncompress($rowsBoxes['cache']));
 ?>
@@ -146,7 +117,7 @@ while ($rowsBoxes = mysql_fetch_assoc($boxes))
 				</table>
 <?php
 
-if (mysql_num_rows($boxes) != 0)
+if (mysqli_num_rows($boxes) != 0)
 {
 ?>
 				<script type="text/javascript">
