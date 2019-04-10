@@ -1,33 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * LICENSE:
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * @categories	Games/Entertainment, Systems Administration
- * @package		Bright Game Panel
- * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
- * @copyleft	2013
- * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
- * @link		http://www.bgpanel.net/
- */
-
-
-
 $return = TRUE;
 
 
@@ -39,26 +10,26 @@ require_once("../libs/phpseclib/Crypt/AES.php");
 
 if (isset($_POST['task']))
 {
-	$task = mysql_real_escape_string($_POST['task']);
+	$task = mysqli_real_escape_string($conn, $_POST['task']);
 }
 else if (isset($_GET['task']))
 {
-	$task = mysql_real_escape_string($_GET['task']);
+	$task = mysqli_real_escape_string($conn, $_GET['task']);
 }
 
 
 switch (@$task)
 {
 	case 'scriptadd':
-		$groupid = mysql_real_escape_string($_POST['groupID']);
-		$boxid = mysql_real_escape_string($_POST['boxID']);
-		$catid = mysql_real_escape_string($_POST['catID']);
-		$name = mysql_real_escape_string($_POST['name']);
-		$description = mysql_real_escape_string($_POST['description']);
-		$filename = mysql_real_escape_string($_POST['file']);
-		$startline = mysql_real_escape_string($_POST['startLine']);
-		$mode = mysql_real_escape_string($_POST['mode']);
-		$homedir = mysql_real_escape_string($_POST['homeDir']);
+		$groupid = mysqli_real_escape_string($conn, $_POST['groupID']);
+		$boxid = mysqli_real_escape_string($conn, $_POST['boxID']);
+		$catid = mysqli_real_escape_string($conn, $_POST['catID']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$description = mysqli_real_escape_string($conn, $_POST['description']);
+		$filename = mysqli_real_escape_string($conn, $_POST['file']);
+		$startline = mysqli_real_escape_string($conn, $_POST['startLine']);
+		$mode = mysqli_real_escape_string($conn, $_POST['mode']);
+		$homedir = mysqli_real_escape_string($conn, $_POST['homeDir']);
 		###
 		//Used to fill in the blanks of the form
 		$_SESSION['groupid'] = $groupid;
@@ -158,7 +129,7 @@ switch (@$task)
 		###
 		if ($mode == '0') // NoHup Case
 		{
-			query_basic( "INSERT INTO `".DBPREFIX."script` SET
+			$sql = ( "INSERT INTO `".DBPREFIX."script` SET
 				`boxid` = '".$boxid."',
 				`catid` = '".$catid."',
 				`name` = '".$name."',
@@ -168,10 +139,11 @@ switch (@$task)
 				`filename` = '".$filename."',
 				`homedir` = '".$homedir."',
 				`type` = '".$mode."'" );
+			mysqli_query($conn, $sql); // it has to be executed here otherwise $mysqli_insert_id isn't working! #fix_later
 		}
 		else if ($mode == '1') // Screen Case
 		{
-			query_basic( "INSERT INTO `".DBPREFIX."script` SET
+			$sql = ( "INSERT INTO `".DBPREFIX."script` SET
 				`boxid` = '".$boxid."',
 				`catid` = '".$catid."',
 				`name` = '".$name."',
@@ -183,9 +155,10 @@ switch (@$task)
 				`homedir` = '".$homedir."',
 				`type` = '".$mode."',
 				`screen` = '".preg_replace('#[^a-zA-Z0-9]#', "_", $name)."'" );
+			mysqli_query($conn, $sql); // it has to be executed here otherwise $mysqli_insert_id isn't working! #fix_later
 		}
 		###
-		$scriptid = mysql_insert_id();
+		$scriptid = mysqli_insert_id($conn);
 		###
 		if ($groupid != 'none')
 		{
@@ -200,17 +173,17 @@ switch (@$task)
 		break;
 
 	case 'scriptprofile':
-		$scriptid = mysql_real_escape_string($_POST['scriptid']);
-		$groupid = mysql_real_escape_string($_POST['groupID']);
-		$boxid = mysql_real_escape_string($_POST['boxID']);
-		$catid = mysql_real_escape_string($_POST['catID']);
-		$name = mysql_real_escape_string($_POST['name']);
-		$status = mysql_real_escape_string($_POST['status']);
-		$description = mysql_real_escape_string($_POST['description']);
-		$filename = mysql_real_escape_string($_POST['file']);
-		$startline = mysql_real_escape_string($_POST['startLine']);
-		$mode = mysql_real_escape_string($_POST['mode']);
-		$homedir = mysql_real_escape_string($_POST['homeDir']);
+		$scriptid = mysqli_real_escape_string($conn, $_POST['scriptid']);
+		$groupid = mysqli_real_escape_string($conn, $_POST['groupID']);
+		$boxid = mysqli_real_escape_string($conn, $_POST['boxID']);
+		$catid = mysqli_real_escape_string($conn, $_POST['catID']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$status = mysqli_real_escape_string($conn, $_POST['status']);
+		$description = mysqli_real_escape_string($conn, $_POST['description']);
+		$filename = mysqli_real_escape_string($conn, $_POST['file']);
+		$startline = mysqli_real_escape_string($conn, $_POST['startLine']);
+		$mode = mysqli_real_escape_string($conn, $_POST['mode']);
+		$homedir = mysqli_real_escape_string($conn, $_POST['homeDir']);
 		###
 		//Check the inputs. Output an error if the validation failed
 		###
@@ -404,9 +377,9 @@ switch (@$task)
 		}
 		query_basic( "DELETE FROM `".DBPREFIX."script` WHERE `scriptid` = '".$scriptid."' LIMIT 1" );
 		###
-		$message = 'Script Deleted: '.mysql_real_escape_string($rows['name']);
+		$message = 'Script Deleted: '.mysqli_real_escape_string($conn, $rows['name']);
 		###
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Script Deleted Successfully!');
 		$_SESSION['msg2'] = T_('The selected script has been removed.');
@@ -502,8 +475,8 @@ switch (@$task)
 		query_basic( "UPDATE `".DBPREFIX."script` SET `status` = 'Active' WHERE `scriptid` = '".$scriptid."'" );
 		###
 		//Adding event to the database
-		$message = 'Script Validated : '.mysql_real_escape_string($script['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Script Validated : '.mysqli_real_escape_string($conn, $script['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Script Successfully Validated!');
 		$_SESSION['msg2'] = T_('The script is now ready for use.');
@@ -516,8 +489,8 @@ switch (@$task)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 	case 'scriptcatadd':
-		$name = mysql_real_escape_string($_POST['name']);
-		$description = mysql_real_escape_string($_POST['notes']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$description = mysqli_real_escape_string($conn, $_POST['notes']);
 		###
 		//Used to fill in the blanks of the form
 		$_SESSION['name'] = $name;
@@ -562,9 +535,9 @@ switch (@$task)
 		break;
 
 	case 'scriptcatedit':
-		$catid = mysql_real_escape_string($_POST['catid']);
-		$name = mysql_real_escape_string($_POST['name']);
-		$description = mysql_real_escape_string($_POST['notes']);
+		$catid = mysqli_real_escape_string($conn, $_POST['catid']);
+		$name = mysqli_real_escape_string($conn, $_POST['name']);
+		$description = mysqli_real_escape_string($conn, $_POST['notes']);
 		###
 		//Check the inputs. Output an error if the validation failed
 		###
@@ -798,8 +771,8 @@ switch (@$task)
 		}
 		###
 		//Adding event to the database
-		$message = 'Script Launched : '.mysql_real_escape_string($script['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `scriptid` = '".$scriptid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Script Launched : '.mysqli_real_escape_string($conn, $script['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `scriptid` = '".$scriptid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Script Successfully Launched!');
 		$_SESSION['msg2'] = T_('With command').' : '.htmlspecialchars($cmd, ENT_QUOTES);
@@ -905,8 +878,8 @@ switch (@$task)
 		query_basic( "UPDATE `".DBPREFIX."script` SET `panelstatus` = 'Stopped' WHERE `scriptid` = '".$scriptid."'" );
 		###
 		//Adding event to the database
-		$message = 'Script Stopped : '.mysql_real_escape_string($script['name']);
-		query_basic( "INSERT INTO `".DBPREFIX."log` SET `scriptid` = '".$scriptid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
+		$message = 'Script Stopped : '.mysqli_real_escape_string($conn, $script['name']);
+		query_basic( "INSERT INTO `".DBPREFIX."log` SET `scriptid` = '".$scriptid."', `message` = '".$message."', `name` = '".mysqli_real_escape_string($conn, $_SESSION['adminfirstname'])." ".mysqli_real_escape_string($conn, $_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Script Successfully Stopped!');
 		$_SESSION['msg2'] = '';
