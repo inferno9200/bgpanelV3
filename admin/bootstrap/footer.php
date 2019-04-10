@@ -1,4 +1,5 @@
 <?php
+//Prevent direct access
 if (!defined('LICENSE'))
 {
 	exit('Access Denied');
@@ -23,14 +24,12 @@ if (isAdminLoggedIn() == TRUE)
 ?>
 		<script type="text/javascript">
 		$(document).ready(function() {
-			<!-- Header Tooltips -->
 			$('#gototop').tooltip({placement: 'bottom'});
 			$('#clock').tooltip({placement: 'bottom'});
 			$('#notificationsPopover').popover({placement: 'bottom', trigger: 'hover'});
 			$('#me').tooltip({placement: 'bottom'});
 			$('#logout').tooltip({placement: 'bottom'});
 		});
-		<!-- nav-scripts -->
 		function doScript(id, name, action)
 		{
 			if (confirm("Are you sure you want to "+action+" script: "+name+"?"))
