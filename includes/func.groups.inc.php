@@ -98,7 +98,7 @@ function getGroupServers($groupid)
 		if (query_numrows( "SELECT `serverid` FROM `".DBPREFIX."server` WHERE `groupid` = '".$groupid."'" ) > 0) // We check if the group has servers
 		{
 			// The specified group has servers
-
+            $conn = mysqli_connect(DBHOST, DBUSER, DBPASSWORD, DBNAME);
 			$servers = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."server` WHERE `groupid` = '".$groupid."'" );
 
 			$i = 0;
@@ -130,7 +130,7 @@ function getGroupClients($groupid)
 		if (query_numrows( "SELECT `id` FROM `".DBPREFIX."groupMember`" ) > 0)
 		{
 			// There is at least one member
-
+            $conn = mysqli_connect(DBHOST, DBUSER, DBPASSWORD, DBNAME);
 			$members = mysqli_query($conn, "SELECT `clientid`, `groupids` FROM `".DBPREFIX."groupMember`" );
 
 			$i = 0;
