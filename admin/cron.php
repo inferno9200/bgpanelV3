@@ -10,18 +10,13 @@ set_include_path(realpath(dirname(__FILE__)));
 
 require('../configuration.php');
 
-/**
- * CRYPT_KEY is the Passphrase Used to Cipher/Decipher SSH Passwords
- * The key is stored into the file: ".ssh/passphrase"
- */
-define('CRYPT_KEY', file_get_contents("../.ssh/passphrase"));
-
-
 require('../includes/functions.php');
 require('../includes/mysql.php');
 require_once('../libs/lgsl/lgsl_class.php');
-require_once('../libs/phpseclib/SSH2.php');
-require_once("../libs/phpseclib/Crypt/AES.php");
+require '../libs/vendor/autoload.php';
+use phpseclib\Crypt\AES;
+use phpseclib\Crypt\Random;
+use phpseclib\Net\SSH2;
 
 
 //Checks if the install directory has been removed
@@ -114,11 +109,12 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 
 	while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 	{
-		$aes = new Crypt_AES();
+		$passphrased = file_get_contents('../.ssh/passphrase');
+		$aes = new AES(AES::MODE_ECB);
 		$aes->setKeyLength(256);
-		$aes->setKey(CRYPT_KEY);
+		$aes->setKey($passphrased);
 
-		$ssh = new Net_SSH2($rowsBoxes['ip'], $rowsBoxes['sshport']);
+		$ssh = new SSH2($rowsBoxes['ip'], $rowsBoxes['sshport']);
 
 		if (!$ssh->login($rowsBoxes['login'], $aes->decrypt($rowsBoxes['password'])))
 		{
