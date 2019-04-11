@@ -90,10 +90,10 @@ $bgpCoreInfo = simplexml_load_file('../.version/version.xml');
  * VERSION CONTROL
  * Check that core files are compatible with the current BrightGamePanel Database
  */
-if ($panelVersion['value'] != $bgpCoreInfo->{'version'})
-{
-	exit('<html><head></head><body><h1><b>Wrong Database Version Detected</b></h1><br /><h3>Make sure you have followed the instructions to install/update the database.</h3></body></html>');
-}
+#if ($panelVersion['value'] != $bgpCoreInfo->{'version'})
+#{
+#	exit('<html><head></head><body><h1><b>Wrong Database Version Detected</b></h1><br /><h3>Make sure you have followed the instructions to install/update the database.</h3></body></html>');
+#}
 
 
 /**
