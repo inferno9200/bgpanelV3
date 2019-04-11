@@ -25,7 +25,7 @@ include("./bootstrap/notifications.php");
 	<h3>BGP V3</h3>
 	<div style="width:auto;height:480px;overflow:scroll;overflow-y:scroll;overflow-x:hidden;">
 <?php
-$license = fopen('../gpl-3.0.txt', 'r');
+$license = fopen('../README.md', 'r');
 
 while ($rows = fgets($license))
 {
