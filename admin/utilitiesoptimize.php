@@ -16,6 +16,7 @@ $title = T_('Optimize Database');
 /* ANALYZE BGP TABLES */
 function analyze_database()
 {
+	$conn = mysqli_connect(DBHOST, DBUSER, DBPASSWORD, DBNAME);
 	$result = mysqli_query($conn, 'SHOW TABLES');
 	$i = 0;
 

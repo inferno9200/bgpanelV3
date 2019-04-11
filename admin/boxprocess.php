@@ -2,9 +2,10 @@
 $return = TRUE;
 require("../configuration.php");
 require("./include.php");
-require("../includes/func.ssh2.inc.php");
-require_once("../libs/phpseclib/Crypt/AES.php");
-
+require '../libs/vendor/autoload.php';
+use phpseclib\Crypt\AES;
+use phpseclib\Crypt\Random;
+use phpseclib\Net\SSH2;
 
 if (isset($_POST['task']))
 {
@@ -91,11 +92,11 @@ switch (@$task)
 		if ($verify == 'on')
 		{
 			// Get SSH2 Object OR ERROR String
-			$ssh = newNetSSH2($ip, $sshport, $login, $password);
-			if (!is_object($ssh))
-			{
+			$ssh = new SSH2($ip, $sshport);
+			
+			if (!$ssh->login($login, $password)) {
 				$_SESSION['msg1'] = T_('Connection Error!');
-				$_SESSION['msg2'] = $ssh;
+				$_SESSION['msg2'] = T_('Please check your ip/password or username and ssh port!');
 				$_SESSION['msg-type'] = 'error';
 				header( "Location: boxadd.php" );
 				die();
@@ -114,9 +115,10 @@ switch (@$task)
 		$sshport = abs($sshport);
 		###
 		//Adding the box to the database
-		$aes = new Crypt_AES();
+		$passphrased = file_get_contents('../.ssh/passphrase');
+		$aes = new AES(AES::MODE_ECB);
 		$aes->setKeyLength(256);
-		$aes->setKey(CRYPT_KEY);
+		$aes->setKey($passphrased);
 		$sql = ( "INSERT INTO `".DBPREFIX."box` SET
 			`name` = '".$name."',
 			`ip` = '".$ip."',
