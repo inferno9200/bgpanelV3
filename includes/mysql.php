@@ -19,18 +19,17 @@ if (!$db_connection)
  *
  * Used for INSERT INTO - UPDATE - DELETE requests.
  *
- * Return true on success
+ * No Return.
  */
-function query_basic($query) {
+function query_basic($query)
+{
 	$conn = mysqli_connect(DBHOST, DBUSER, DBPASSWORD, DBNAME);
 	$result = mysqli_query($conn, $query);
-	if ($result == FALSE) {
+	if ($result == FALSE)
+	{
 		$msg = 'Invalid query : '.mysqli_error($conn)."\n";
 		echo $msg;
-		return FALSE;
 	}
-	else
-		return TRUE;
 }
 /**
  * query_numrows -- mysql_query + mysql_num_rows
