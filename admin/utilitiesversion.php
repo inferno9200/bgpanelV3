@@ -15,7 +15,7 @@ $title = T_('Version Check');
  * REMOTE VERSION RETRIEVER
  * Retrieve the last version of the panel from www.bgpanel.net
  */
-$request = "http://version.bgpanel.net/";
+$request = "https://raw.githubusercontent.com/DopeProjects/bgpanelV3/master/.version/version.xml";
 
 $data = json_decode(file_get_contents($request));
 
