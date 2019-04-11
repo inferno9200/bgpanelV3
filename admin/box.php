@@ -14,7 +14,6 @@ $title = T_('Boxes');
 $cron = query_fetch_assoc( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'lastcronrun' LIMIT 1" );
 $boxes = mysqli_query($conn, "SELECT `boxid`, `name`, `ip`, `sshport`, `cache` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
 
-
 include("./bootstrap/header.php");
 
 
