@@ -148,7 +148,7 @@ if ($page != 'login')
 	if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box`" ) != 0)
 	{
 		$boxesNav = mysqli_query($conn, "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `name`" );
-		while ($rowsBoxesNav = mysqli_fetch_assoc($conn, $boxesNav))
+		while ($rowsBoxesNav = mysqli_fetch_assoc($boxesNav))
 		{
 ?>
 											<li class="dropdown-submenu">

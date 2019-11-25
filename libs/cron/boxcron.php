@@ -8,91 +8,19 @@ set_time_limit(60);
 chdir(realpath(dirname(__FILE__)));
 set_include_path(realpath(dirname(__FILE__)));
 
-require('../configuration.php');
+require('../../configuration.php');
 
-require('../includes/functions.php');
-require('../includes/mysql.php');
-require_once('../libs/lgsl/lgsl_class.php');
-require '../libs/vendor/autoload.php';
+require('../../includes/functions.php');
+require('../../includes/mysql.php');
+require '../vendor/autoload.php';
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
 use phpseclib\Net\SSH2;
 
 
-//Checks if the install directory has been removed
-if (is_dir("../install"))
-{
-	die();
-}
-
-
-/**
- * GET BrightGamePanel Database INFORMATION
- * Load 'values' from `config` Table
- */
-$panelVersion = query_fetch_assoc( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'panelversion' LIMIT 1" );
-$maintenance = query_fetch_assoc( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'maintenance' LIMIT 1" );
-
-
-/**
- * GET BGP CORE FILES INFORMATION
- * Load version.xml (ROOT/.version/version.xml)
- */
-$bgpCoreInfo = simplexml_load_file('../.version/version.xml');
-
-
-/**
- * VERSION CONTROL
- * Check that core files are compatible with the current BrightGamePanel Database
- */
-if ($panelVersion['value'] != $bgpCoreInfo->{'version'})
-{
-	die();
-}
-
-/**
- * MAINTENANCE CHECKER
- */
-if ($maintenance['value']  == '1')
-{
-	die();
-}
-
-
-unset($panelVersion, $maintenance);
-
-
 //------------------------------------------------------------------------------------------------------------+
 
 query_basic( "UPDATE `".DBPREFIX."config` SET `value` = '".date('Y-m-d H:i:s')."' WHERE `setting` = 'lastcronrun'" );
-
-//------------------------------------------------------------------------------------------------------------+
-
-
-
-//------------------------------------------------------------------------------------------------------------+
-//------------------------------------------------------------------------------------------------------------+
-
-/**
- * LGSL CRON
- */
-
-lgsl_database();
-
-// SETTINGS:
-
-$lgsl_config['cache_time'] = 60; // HOW OLD CACHE MUST BE BEFORE IT NEEDS REFRESHING
-$request = "sep";                // WHAT TO PRE-CACHE: [s] = BASIC INFO [e] = SETTINGS [p] = PLAYERS
-
-//------------------------------------------------------------------------------------------------------------+
-
-$mysqli_query  = "SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `disabled`=0 ORDER BY `cache_time` ASC";
-$mysqli_result = mysqli_query($conn, $mysqli_query) or die(mysqli_error($conn));
-
-while($mysqli_row = mysqli_fetch_array($mysqli_result, MYSQLI_ASSOC))
-{
-	lgsl_query_cached($mysqli_row['type'], $mysqli_row['ip'], $mysqli_row['c_port'], $mysqli_row['q_port'], $mysqli_row['s_port'], $request);
-}
 
 //------------------------------------------------------------------------------------------------------------+
 //------------------------------------------------------------------------------------------------------------+
@@ -109,7 +37,7 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 
 	while ($rowsBoxes = mysqli_fetch_assoc($boxes))
 	{
-		$passphrased = file_get_contents('../.ssh/passphrase');
+		$passphrased = file_get_contents('../../.ssh/passphrase');
 		$aes = new AES(AES::MODE_ECB);
 		$aes->setKeyLength(256);
 		$aes->setKey($passphrased);
@@ -118,8 +46,6 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 
 		if (!$ssh->login($rowsBoxes['login'], $aes->decrypt($rowsBoxes['password'])))
 		{
-			//Connection Error!
-
 			$boxCache =	array(
 				$rowsBoxes['boxid'] => array(
 					'players'	=> array('players' => 0),

@@ -17,8 +17,10 @@ $return = 'boxgamefile.php?id='.urlencode($boxid);
 
 require("../configuration.php");
 require("./include.php");
-require_once("../includes/func.ssh2.inc.php");
-require_once("../libs/phpseclib/Crypt/AES.php");
+require '../libs/vendor/autoload.php';
+use phpseclib\Crypt\AES;
+use phpseclib\Crypt\Random;
+use phpseclib\Net\SSH2;
 require_once("../libs/gameinstaller/gameinstaller.php");
 
 
@@ -34,16 +36,20 @@ if (query_numrows( "SELECT `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$box
 $rows = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 $games = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."game` ORDER BY `game`" );
 
-$aes = new Crypt_AES();
+$passphrased = file_get_contents('../.ssh/passphrase');
+$aes = new AES(AES::MODE_ECB);
 $aes->setKeyLength(256);
-$aes->setKey(CRYPT_KEY);
+$aes->setKey($passphrased);
 
 // Get SSH2 Object OR ERROR String
-$ssh = newNetSSH2($rows['ip'], $rows['sshport'], $rows['login'], $aes->decrypt($rows['password']));
-if (!is_object($ssh))
+$thisuser = $rows['login'];
+$thispass = $aes->decrypt($rows['password']);
+$ssh = new SSH2($rows['ip'], $rows['sshport']);
+
+if (!$ssh->login($thisuser, $thispass)) 
 {
 	$_SESSION['msg1'] = T_('Connection Error!');
-	$_SESSION['msg2'] = $ssh;
+	$_SESSION['msg2'] = T_('Please check your ip/password or username and ssh port!');
 	$_SESSION['msg-type'] = 'error';
 }
 
