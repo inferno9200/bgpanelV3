@@ -15,7 +15,6 @@ $numBoxes = query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box`" );
 $numGroups = query_numrows( "SELECT `groupid` FROM `".DBPREFIX."group`" );
 $games = mysqli_query($conn, "SELECT `gameid`, `game` FROM `".DBPREFIX."game` WHERE `status` = 'Active' ORDER BY `game`" );
 
-
 //---------------------------------------------------------+
 
 if ($numBoxes == 0)
@@ -66,14 +65,14 @@ switch ($step)
 ?>
 			<div class="well">
 				<div style="text-align: center;">
-					<span class="label label-warning"><?php echo T_('No Boxes Found'); ?></span><br />
-					<?php echo T_('No boxes found.'); ?> <a href="boxadd.php"><?php echo T_('Click here'); ?></a> <?php echo T_('to add a new box.'); ?>
+					<span class="label label-warning">No Boxes Found</span><br />
+					No Boxes Found <a href="boxadd.php">Click here</a> To add a new box.
 				</div>
 			</div>
 			<div style="text-align: center;">
 				<ul class="pager">
 					<li>
-						<a href="server.php"><?php echo T_('Back to Servers'); ?></a>
+						<a href="server.php">Back to Servers</a>
 					</li>
 				</ul>
 			</div>
@@ -90,14 +89,14 @@ switch ($step)
 ?>
 			<div class="well">
 				<div style="text-align: center;">
-					<span class="label label-warning"><?php echo T_('No Groups Found'); ?></span><br />
-					<?php echo T_('No groups found.'); ?> <a href="configgroupadd.php"><?php echo T_('Click here'); ?></a> <?php echo T_('to add a new group.'); ?>
+					<span class="label label-warning">No Groups Found</span><br />
+					No Groups Found <a href="configgroupadd.php">Click here</a> To add a new group.
 				</div>
 			</div>
 			<div style="text-align: center;">
 				<ul class="pager">
 					<li>
-						<a href="server.php"><?php echo T_('Back to Servers'); ?></a>
+						<a href="server.php">Back to Servers</a>
 					</li>
 				</ul>
 			</div>
@@ -114,7 +113,7 @@ switch ($step)
 ?>
 			<div class="well">
 				<form method="get" action="serveradd.php">
-					<label><?php echo T_('Game'); ?></label>
+					<label>Select Game</label>
 						<select name="gameid">
 <?php
 
@@ -130,12 +129,12 @@ while ($rowsGames = mysqli_fetch_assoc($games))
 ?>
 						</select>
 					<div style="text-align: center; margin-top: 19px;">
-						<button type="submit" class="btn btn-primary"><?php echo T_('Submit'); ?></button>
+						<button type="submit" class="btn btn-primary">Submit</button>
 					</div>
 					<div style="text-align: center; margin-top: 19px;">
 						<ul class="pager">
 							<li>
-								<a href="server.php"><?php echo T_('Back to Servers'); ?></a>
+								<a href="server.php">Back to Servers</a>
 							</li>
 						</ul>
 					</div>
@@ -151,12 +150,11 @@ while ($rowsGames = mysqli_fetch_assoc($games))
 
 
 	case 'form':
-		$rows = query_fetch_assoc($conn, "SELECT * FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
+		$rows = query_fetch_assoc("SELECT * FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
 		$clients = mysqli_query($conn, "SELECT `clientid`, `firstname`, `lastname` FROM `".DBPREFIX."client` WHERE `status` = 'Active' ORDER BY `clientid`" );
 		$admins = mysqli_query($conn, "SELECT `adminid`, `username` FROM `".DBPREFIX."admin` WHERE `status` = 'Active' ORDER BY `adminid`" );
 		$boxes = mysqli_query($conn, "SELECT `boxid`, `name` FROM `".DBPREFIX."box` ORDER BY `boxid`" );
 		$groups = mysqli_query($conn, "SELECT `groupid`, `name` FROM `".DBPREFIX."group` ORDER BY `groupid`" );
-		###
 ?>
 			<ul class="breadcrumb">
 				<li><a href="serveradd.php"><?php echo T_('Select Game'); ?></a> <span class="divider">/</span></li>
@@ -168,15 +166,9 @@ while ($rowsGames = mysqli_fetch_assoc($games))
 					<input type="hidden" name="gameID" value="<?php echo $gameid; ?>" />
 					<label><?php echo T_('Game'); ?></label>
 						<input type="text" class="input-xlarge disabled" disabled="" placeholder="<?php echo htmlspecialchars($rows['game'], ENT_QUOTES); ?>">
-					<label><?php echo T_('Server Name'); ?></label>
-						<input type="text" name="name" class="span5" value="<?php
-if (isset($_SESSION['name']))
-{
-	echo htmlspecialchars($_SESSION['name'], ENT_QUOTES);
-	unset($_SESSION['name']);
-}
-?>">
-					<label><?php echo T_('Owner Group'); ?></label>
+					<label>Server Name</label>
+						<input type="text" name="name" class="span5" value="My Server Name">
+					<label>Owner Group</label>
 						<select name="groupID">
 <?php
 //---------------------------------------------------------+

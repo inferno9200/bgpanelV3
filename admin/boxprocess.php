@@ -88,7 +88,7 @@ switch (@$task)
 			die();
 		}
 		###
-		//Check SSH2 connection if specified
+		//Check SSH2 connection if specified 
 		if ($verify == 'on')
 		{
 			// Get SSH2 Object OR ERROR String
@@ -270,14 +270,15 @@ switch (@$task)
 			{
 				// Get SSH Password
 				$passwd = query_fetch_assoc( "SELECT `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
-				$aes = new Crypt_AES();
-				$aes->setKeyLength(256);
-				$aes->setKey(CRYPT_KEY);
+	  	        $passphrased = file_get_contents('../.ssh/passphrase');
+		        $aes = new AES(AES::MODE_ECB);
+		        $aes->setKeyLength(256);
+		        $aes->setKey($passphrased);
 				$password = $aes->decrypt($passwd['password']);
 				unset($passwd);
 			}
 			// Get SSH2 Object OR ERROR String
-			$ssh = newNetSSH2($ip, $sshport, $login, $password);
+			$ssh = new SSH2($ip, $sshport, $login, $password);
 			if (!is_object($ssh))
 			{
 				$_SESSION['msg1'] = T_('Connection Error!');
@@ -298,9 +299,10 @@ switch (@$task)
 		}
 		else
 		{
-			$aes = new Crypt_AES();
-			$aes->setKeyLength(256);
-			$aes->setKey(CRYPT_KEY);
+		    $passphrased = file_get_contents('../.ssh/passphrase');
+		    $aes = new AES(AES::MODE_ECB);
+		    $aes->setKeyLength(256);
+		    $aes->setKey($passphrased);
 			$password = $aes->encrypt($password);
 		}
 
@@ -505,25 +507,27 @@ switch (@$task)
 		if (!empty($newip))
 		{
 			//Check SSH2 connection if specified
-			list($sshport, $login, $password) = mysqli_fetch_array(mysqli_query($conn, "SELECT `sshport`, `login`, `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" ));
-			$aes = new Crypt_AES();
-			$aes->setKeyLength(256);
-			$aes->setKey(CRYPT_KEY);
-			$password = $aes->decrypt($password);
-			if ($verify == 'on')
-			{
+            //$passphrased = file_get_contents('../.ssh/passphrase');
+			//list($sshport, $login, $password) = mysqli_fetch_array(mysqli_query($conn, "SELECT `sshport`, `login`, `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" ));
+			//$aes = new AES(AES::MODE_ECB);
+			//$aes->setKeyLength(256);
+			//$aes->setKey($passphrased);
+			//$password = $aes->decrypt($password);
+            // Is not needed if a user is adding a new ip he's already configured his machine!
+			// if ($verify == 'on')
+			// {
 				// Get SSH2 Object OR ERROR String
-				$ssh = newNetSSH2($newip, $sshport, $login, $password);
-				if (!is_object($ssh))
-				{
-					$_SESSION['msg1'] = T_('Connection Error!');
-					$_SESSION['msg2'] = $ssh;
-					$_SESSION['msg-type'] = 'error';
-					header( "Location: boxip.php?id=".urlencode($boxid) );
-					die();
-				}
-				$ssh->disconnect();
-			}
+            //   $ssh = new SSH2($newip, $sshport, $login, $password);
+			// 	 if (!is_object($ssh))
+			//	 {
+			//      $_SESSION['msg1'] = T_('Connection Error!');
+			//      $_SESSION['msg2'] = $ssh;
+			//      $_SESSION['msg-type'] = 'error';
+			//      header( "Location: boxip.php?id=".urlencode($boxid) );
+			//      die();
+			//  }
+			//  $ssh->disconnect();
+			// }
 			// Add IP
 			query_basic( "INSERT INTO `".DBPREFIX."boxIp` SET `boxid` = '".$boxid."', `ip` = '".$newip."'" );
 
@@ -575,12 +579,13 @@ switch (@$task)
 		$box = query_fetch_assoc( "SELECT `ip`, `login`, `password`, `sshport`, `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 		$game = query_fetch_assoc( "SELECT `game`, `cachedir` FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
 		###
-		$aes = new Crypt_AES();
+		$passphrased = file_get_contents('../.ssh/passphrase');
+		$aes = new AES(AES::MODE_ECB);
 		$aes->setKeyLength(256);
-		$aes->setKey(CRYPT_KEY);
+		$aes->setKey($passphrased);
 		###
 		// Get SSH2 Object OR ERROR String
-		$ssh = newNetSSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
+		$ssh = new SSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
 		if (!is_object($ssh))
 		{
 			$_SESSION['msg1'] = T_('Connection Error!');
@@ -662,12 +667,13 @@ switch (@$task)
 		$box = query_fetch_assoc( "SELECT `ip`, `login`, `password`, `sshport`, `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 		$game = query_fetch_assoc( "SELECT `game`, `cachedir` FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
 		###
-		$aes = new Crypt_AES();
+		$passphrased = file_get_contents('../.ssh/passphrase');
+		$aes = new AES(AES::MODE_ECB);
 		$aes->setKeyLength(256);
-		$aes->setKey(CRYPT_KEY);
+		$aes->setKey($passphrased);
 		###
 		// Get SSH2 Object OR ERROR String
-		$ssh = newNetSSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
+		$ssh = new SSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
 		if (!is_object($ssh))
 		{
 			$_SESSION['msg1'] = T_('Connection Error!');
@@ -719,12 +725,13 @@ switch (@$task)
 		$box = query_fetch_assoc( "SELECT `ip`, `login`, `password`, `sshport`, `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 		$game = query_fetch_assoc( "SELECT `game`, `cachedir` FROM `".DBPREFIX."game` WHERE `gameid` = '".$gameid."' LIMIT 1" );
 		###
-		$aes = new Crypt_AES();
+		$passphrased = file_get_contents('../.ssh/passphrase');
+		$aes = new AES(AES::MODE_ECB);
 		$aes->setKeyLength(256);
-		$aes->setKey(CRYPT_KEY);
+		$aes->setKey($passphrased);
 		###
 		// Get SSH2 Object OR ERROR String
-		$ssh = newNetSSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
+		$ssh = new SSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
 		if (!is_object($ssh))
 		{
 			$_SESSION['msg1'] = T_('Connection Error!');

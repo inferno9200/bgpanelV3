@@ -70,11 +70,11 @@
       {
         case "e107":
           @include "{$lgsl_file_path}../../../e107_config.php";
-          $lgsl_config['db']['server'] = $mySQLserver;
-          $lgsl_config['db']['user']   = $mySQLuser;
-          $lgsl_config['db']['pass']   = $mySQLpassword;
-          $lgsl_config['db']['db']     = $mySQLdefaultdb;
-          $lgsl_config['db']['prefix'] = $mySQLprefix;
+          $lgsl_config['db']['server'] = $mysqliserver;
+          $lgsl_config['db']['user']   = $mysqliuser;
+          $lgsl_config['db']['pass']   = $mysqlipassword;
+          $lgsl_config['db']['db']     = $mysqlidefaultdb;
+          $lgsl_config['db']['prefix'] = $mysqliprefix;
         break;
 
         case "joomla":
@@ -111,8 +111,8 @@
       }
     }
 
-    $lgsl_database  = mysql_connect($lgsl_config['db']['server'], $lgsl_config['db']['user'], $lgsl_config['db']['pass']) or die(mysql_error());
-    $lgsl_select_db = mysql_select_db($lgsl_config['db']['db'], $lgsl_database) or die(mysql_error());
+    $lgsl_database  = mysqli_connect($lgsl_config['db']['server'], $lgsl_config['db']['user'], $lgsl_config['db']['pass']) or die(mysqli_error());
+    $lgsl_select_db = mysqli_select_db($lgsl_config['db']['db'], $lgsl_database) or die(mysqli_error());
   }
 
 //------------------------------------------------------------------------------------------------------------+
@@ -128,34 +128,34 @@
     if ($id != NULL)
     {
       $id           = intval($id);
-      $mysql_query  = "SELECT * FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `id`='{$id}' LIMIT 1";
-      $mysql_result = mysql_query($mysql_query) or die(mysql_error());
-      $mysql_row    = mysql_fetch_array($mysql_result, MYSQL_ASSOC);
-      if (!$mysql_row) { return FALSE; }
-      list($type, $ip, $c_port, $q_port, $s_port) = array($mysql_row['type'], $mysql_row['ip'], $mysql_row['c_port'], $mysql_row['q_port'], $mysql_row['s_port']);
+      $mysqli_query  = "SELECT * FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `id`='{$id}' LIMIT 1";
+      $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
+      $mysqli_row    = mysqli_fetch_array($mysqli_result, mysqli_ASSOC);
+      if (!$mysqli_row) { return FALSE; }
+      list($type, $ip, $c_port, $q_port, $s_port) = array($mysqli_row['type'], $mysqli_row['ip'], $mysqli_row['c_port'], $mysqli_row['q_port'], $mysqli_row['s_port']);
     }
     else
     {
-      list($type, $ip, $c_port, $q_port, $s_port) = array(mysql_real_escape_string($type), mysql_real_escape_string($ip), intval($c_port), intval($q_port), intval($s_port));
+      list($type, $ip, $c_port, $q_port, $s_port) = array(mysqli_real_escape_string($type), mysqli_real_escape_string($ip), intval($c_port), intval($q_port), intval($s_port));
 
       if (!$type || !$ip || !$c_port || !$q_port) { exit("LGSL PROBLEM: INVALID SERVER '{$type} : {$ip} : {$c_port} : {$q_port} : {$s_port}'"); }
-      $mysql_query  = "SELECT * FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `type`='{$type}' AND `ip`='{$ip}' AND `q_port`='{$q_port}' LIMIT 1";
-      $mysql_result = mysql_query($mysql_query) or die(mysql_error());
-      $mysql_row    = mysql_fetch_array($mysql_result, MYSQL_ASSOC);
+      $mysqli_query  = "SELECT * FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `type`='{$type}' AND `ip`='{$ip}' AND `q_port`='{$q_port}' LIMIT 1";
+      $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
+      $mysqli_row    = mysqli_fetch_array($mysqli_result, mysqli_ASSOC);
 
-      if (!$mysql_row)
+      if (!$mysqli_row)
       {
         if (strpos($request, "a") === FALSE) { exit("LGSL PROBLEM: SERVER NOT IN DATABASE '{$type} : {$ip} : {$c_port} : {$q_port} : {$s_port}'"); }
-        $mysql_query  = "INSERT INTO `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` (`type`,`ip`,`c_port`,`q_port`,`s_port`,`cache`,`cache_time`) VALUES ('{$type}','{$ip}','{$c_port}','{$q_port}','{$s_port}','','')";
-        $mysql_result = mysql_query($mysql_query) or die(mysql_error());
-        $mysql_row    = array("id"=>mysql_insert_id(), "zone"=>"0", "comment"=>"");
+        $mysqli_query  = "INSERT INTO `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` (`type`,`ip`,`c_port`,`q_port`,`s_port`,`cache`,`cache_time`) VALUES ('{$type}','{$ip}','{$c_port}','{$q_port}','{$s_port}','','')";
+        $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
+        $mysqli_row    = array("id"=>mysqli_insert_id(), "zone"=>"0", "comment"=>"");
       }
     }
 
     // UNPACK CACHE AND CACHE TIMES
 
-    $cache      = empty($mysql_row['cache'])      ? array()      : unserialize(base64_decode($mysql_row['cache']));
-    $cache_time = empty($mysql_row['cache_time']) ? array(0,0,0) : explode("_", $mysql_row['cache_time']);
+    $cache      = empty($mysqli_row['cache'])      ? array()      : unserialize(base64_decode($mysqli_row['cache']));
+    $cache_time = empty($mysqli_row['cache_time']) ? array(0,0,0) : explode("_", $mysqli_row['cache_time']);
 
     // SET THE SERVER AS OFFLINE AND PENDING WHEN THERE IS NO CACHE
 
@@ -182,9 +182,9 @@
     $cache['b']['q_port']  = $q_port;
     $cache['b']['s_port']  = $s_port;
     $cache['o']['request'] = $request;
-    $cache['o']['id']      = $mysql_row['id'];
-    $cache['o']['zone']    = $mysql_row['zone'];
-    $cache['o']['comment'] = $mysql_row['comment'];
+    $cache['o']['id']      = $mysqli_row['id'];
+    $cache['o']['zone']    = $mysqli_row['zone'];
+    $cache['o']['comment'] = $mysqli_row['comment'];
 
     // UPDATE CACHE WITH LOCATION
 
@@ -226,8 +226,8 @@
 
       $packed_times = time() + $lgsl_config['cache_time'] + 10;
       $packed_times = "{$packed_times}_{$packed_times}_{$packed_times}";
-      $mysql_query  = "UPDATE `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` SET `cache_time`='{$packed_times}' WHERE `id`='{$mysql_row['id']}' LIMIT 1";
-      $mysql_result = mysql_query($mysql_query) or die(mysql_error());
+      $mysqli_query  = "UPDATE `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` SET `cache_time`='{$packed_times}' WHERE `id`='{$mysqli_row['id']}' LIMIT 1";
+      $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
 
       // GET WHAT IS NEEDED
 
@@ -265,10 +265,10 @@
 
       // UPDATE CACHE
 
-      $packed_cache = mysql_real_escape_string(base64_encode(serialize($cache)));
-      $packed_times = mysql_real_escape_string(implode("_", $cache_time));
-      $mysql_query  = "UPDATE `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` SET `status`='{$cache['b']['status']}',`cache`='{$packed_cache}',`cache_time`='{$packed_times}' WHERE `id`='{$mysql_row['id']}' LIMIT 1";
-      $mysql_result = mysql_query($mysql_query) or die(mysql_error());
+      $packed_cache = mysqli_real_escape_string(base64_encode(serialize($cache)));
+      $packed_times = mysqli_real_escape_string(implode("_", $cache_time));
+      $mysqli_query  = "UPDATE `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` SET `status`='{$cache['b']['status']}',`cache`='{$packed_cache}',`cache_time`='{$packed_times}' WHERE `id`='{$mysqli_row['id']}' LIMIT 1";
+      $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
     }
 
     // RETURN ONLY THE REQUESTED
@@ -297,22 +297,22 @@
     $random       = isset($options['random'])       ? intval($options['random'])       : intval($lgsl_config['random'][$zone]);
     $type         = empty($options['type'])         ? ""                               : preg_replace("/[^a-z0-9_]/", "_", strtolower($options['type']));
     $game         = empty($options['game'])         ? ""                               : preg_replace("/[^a-z0-9_]/", "_", strtolower($options['game']));
-    $mysql_order  = empty($random)                  ? "`cache_time` ASC"               : "rand()";
+    $mysqli_order  = empty($random)                  ? "`cache_time` ASC"               : "rand()";
     $server_limit = empty($random)                  ? 0                                : $random;
 
-                       $mysql_where   = array("`disabled`=0");
-    if ($zone != 0)  { $mysql_where[] = "FIND_IN_SET('{$zone}',`zone`)"; }
-    if ($type != "") { $mysql_where[] = "`type`='{$type}'"; }
+                       $mysqli_where   = array("`disabled`=0");
+    if ($zone != 0)  { $mysqli_where[] = "FIND_IN_SET('{$zone}',`zone`)"; }
+    if ($type != "") { $mysqli_where[] = "`type`='{$type}'"; }
 
-    $mysql_query  = "SELECT `id` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE ".implode(" AND ", $mysql_where)." ORDER BY {$mysql_order}";
-    $mysql_result = mysql_query($mysql_query) or die(mysql_error());
+    $mysqli_query  = "SELECT `id` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE ".implode(" AND ", $mysqli_where)." ORDER BY {$mysqli_order}";
+    $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
     $server_list  = array();
 
-    while ($mysql_row = mysql_fetch_array($mysql_result, MYSQL_ASSOC))
+    while ($mysqli_row = mysqli_fetch_array($mysqli_result, mysqli_ASSOC))
     {
       if (strpos($request, "c") === FALSE && lgsl_timer("check")) { $request .= "c"; }
 
-      $server = lgsl_query_cached("", "", "", "", "", $request, $mysql_row['id']);
+      $server = lgsl_query_cached("", "", "", "", "", $request, $mysqli_row['id']);
 
       if ($hide_offline && empty($server['b']['status'])) { continue; }
       if ($game && $game != preg_replace("/[^a-z0-9_]/", "_", strtolower($server['s']['game']))) { continue; }
@@ -375,12 +375,12 @@
 
     lgsl_database();
 
-    $id           = mysql_real_escape_string(intval($id));
-    $mysql_query  = "SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `id`='{$id}' LIMIT 1";
-    $mysql_result = mysql_query($mysql_query) or die(mysql_error());
-    $mysql_row    = mysql_fetch_array($mysql_result, MYSQL_ASSOC);
+    $id           = mysqli_real_escape_string(intval($id));
+    $mysqli_query  = "SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `{$lgsl_config['db']['prefix']}{$lgsl_config['db']['table']}` WHERE `id`='{$id}' LIMIT 1";
+    $mysqli_result = mysqli_query($mysqli_query) or die(mysqli_error());
+    $mysqli_row    = mysqli_fetch_array($mysqli_result, mysqli_ASSOC);
 
-    return $mysql_row;
+    return $mysqli_row;
   }
 
 //------------------------------------------------------------------------------------------------------------+

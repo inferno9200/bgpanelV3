@@ -4,8 +4,8 @@ $tab = 4;
 $return = 'utilitiesrcontool.php';
 
 
-require("configuration.php");
-require("include.php");
+require("../configuration.php");
+require("./include.php");
 
 
 $title = T_('RCON Tool');
@@ -52,7 +52,7 @@ switch ($step)
 		include("./bootstrap/notifications.php");
 
 
-		$servers = getClientServers( $_SESSION['clientid'] )
+		$servers = getClientServers( $_SESSION['clientid'] );
 
 
 ?>
@@ -103,9 +103,9 @@ switch ($step)
 
 
 	case 'rcon':
-		require("./includes/func.ssh2.inc.php");
-		require_once("./libs/phpseclib/Crypt/AES.php");
-		require_once("./libs/phpseclib/ANSI.php");
+		require("../includes/func.ssh2.inc.php");
+		require_once("../libs/phpseclib/Crypt/AES.php");
+		require_once("../libs/phpseclib/ANSI.php");
 		###
 		$error = '';
 		###

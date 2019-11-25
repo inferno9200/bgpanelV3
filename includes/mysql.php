@@ -59,6 +59,6 @@ function query_fetch_assoc($query) {
 		$msg = 'Invalid query : '.mysqli_error($conn)."\n";
 		echo $msg;
 	}
-	return mysqli_fetch_assoc($result);
+	return (mysqli_fetch_assoc($result));
 }
 ?>

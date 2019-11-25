@@ -14,76 +14,42 @@ else
 ###
 $return = 'boxgamefile.php?id='.urlencode($boxid);
 
-
 require("../configuration.php");
 require("./include.php");
-require '../libs/vendor/autoload.php';
-use phpseclib\Crypt\AES;
-use phpseclib\Crypt\Random;
-use phpseclib\Net\SSH2;
-require_once("../libs/gameinstaller/gameinstaller.php");
-
 
 $title = T_('Box Game File Repositories');
-
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."'" ) == 0)
 {
 	exit('Error: BoxID is invalid.');
 }
 
-
 $rows = query_fetch_assoc( "SELECT * FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 $games = mysqli_query($conn, "SELECT * FROM `".DBPREFIX."game` ORDER BY `game`" );
 
-$passphrased = file_get_contents('../.ssh/passphrase');
-$aes = new AES(AES::MODE_ECB);
-$aes->setKeyLength(256);
-$aes->setKey($passphrased);
-
-// Get SSH2 Object OR ERROR String
-$thisuser = $rows['login'];
-$thispass = $aes->decrypt($rows['password']);
-$ssh = new SSH2($rows['ip'], $rows['sshport']);
-
-if (!$ssh->login($thisuser, $thispass)) 
-{
-	$_SESSION['msg1'] = T_('Connection Error!');
-	$_SESSION['msg2'] = T_('Please check your ip/password or username and ssh port!');
-	$_SESSION['msg-type'] = 'error';
-}
-
-$gameInstaller = new GameInstaller( $ssh );
-
-
 include("./bootstrap/header.php");
-
-
-/**
- * Notifications
- */
 include("./bootstrap/notifications.php");
 
 
 ?>
 			<ul class="nav nav-tabs">
-				<li><a href="boxsummary.php?id=<?php echo $boxid; ?>"><?php echo T_('Summary'); ?></a></li>
-				<li><a href="boxprofile.php?id=<?php echo $boxid; ?>"><?php echo T_('Profile'); ?></a></li>
-				<li><a href="boxip.php?id=<?php echo $boxid; ?>"><?php echo T_('IP Addresses'); ?></a></li>
-				<li><a href="boxserver.php?id=<?php echo $boxid; ?>"><?php echo T_('Servers'); ?></a></li>
-				<li><a href="boxchart.php?id=<?php echo $boxid; ?>"><?php echo T_('Charts'); ?></a></li>
-				<li class="active"><a href="boxgamefile.php?id=<?php echo $boxid; ?>"><?php echo T_('Game File Repositories'); ?></a></li>
-				<li><a href="boxlog.php?id=<?php echo $boxid; ?>"><?php echo T_('Activity Logs'); ?></a></li>
+				<li><a href="boxsummary.php?id=<?php echo $boxid; ?>">Summary</a></li>
+				<li><a href="boxprofile.php?id=<?php echo $boxid; ?>">Profile</a></li>
+				<li><a href="boxip.php?id=<?php echo $boxid; ?>">IP Addresses</a></li>
+				<li><a href="boxserver.php?id=<?php echo $boxid; ?>">Servers</a></li>
+				<li><a href="boxchart.php?id=<?php echo $boxid; ?>">Charts</a></li>
+				<li class="active"><a href="boxgamefile.php?id=<?php echo $boxid; ?>">Game File Repositories</a></li>
+				<li><a href="boxlog.php?id=<?php echo $boxid; ?>">Activity Logs</a></li>
 			</ul>
 			<div class="well">
 				<table id="gamefiles" class="zebra-striped">
 					<thead>
 						<tr>
-							<th><?php echo T_('Game'); ?></th>
-							<th><?php echo T_('Cache Directory'); ?></th>
-							<th><?php echo T_('Disk Usage'); ?></th>
-							<th><?php echo T_('Last Modification'); ?></th>
-							<th><?php echo T_('Status'); ?></th>
+							<th>Game</th>
+							<th>Directory</th>
+							<th>Disk Usage</th>
+							<th>Last Modification</th>
+							<th>Status</th>
 							<th></th>
 							<th></th>
 						</tr>
@@ -93,98 +59,32 @@ include("./bootstrap/notifications.php");
 
 while ($rowsGames = mysqli_fetch_assoc($games))
 {
-	$repoCacheInfo =	$gameInstaller->getCacheInfo( $rowsGames['cachedir'] );
-	$gameExists =		$gameInstaller->gameExists( $rowsGames['game'] );
-
 ?>
 						<tr>
 							<td><?php echo htmlspecialchars($rowsGames['game'], ENT_QUOTES); ?></td>
 							<td><?php echo htmlspecialchars($rowsGames['cachedir'], ENT_QUOTES); ?></td>
-							<td><?php if ($repoCacheInfo != FALSE) { echo htmlspecialchars($repoCacheInfo['size'], ENT_QUOTES); } else { echo T_('None'); } ?></td>
-							<td><?php if ($repoCacheInfo != FALSE) { echo @date('l | F j, Y | H:i', $repoCacheInfo['mtime']); } else { echo T_('Never'); } ?></td>
-							<td><?php
-
-	if ($gameExists == FALSE) {
-		echo "<span class=\"label\">".T_('Game Not Supported')."</span>";
-	}
-	else if ($repoCacheInfo == FALSE) {
-		echo "<span class=\"label label-warning\">".T_('No Cache')."</span>";
-	}
-	else if ($repoCacheInfo['status'] == 'Ready') {
-		echo "<span class=\"label label-success\">Ready</span>";
-	}
-	else if ($repoCacheInfo['status'] == 'Aborted') {
-		echo "<span class=\"label label-important\">Aborted</span>";
-	}
-	else {
-		echo "<span class=\"label label-info\">".htmlspecialchars($repoCacheInfo['status'], ENT_QUOTES)."</span>";
-	}
-
-?></td>
+							<td>None</td>
+							<td>Never</td>
+							<td><span class="label label-success">Ready</span></td>
 							<td>
 								<!-- Actions -->
 								<div style="text-align: center;">
-<?php
-
-	if ($gameExists)
-	{
-		if ( ($repoCacheInfo == FALSE) || ($repoCacheInfo['status'] == 'Aborted') ) {
-		// No repo OR repo not ready
-?>
-									<a class="btn btn-small" href="#" onclick="doRepoAction('<?php echo $boxid; ?>', '<?php echo $rowsGames['gameid']; ?>', 'makeRepo', '<?php echo T_('create a new cache repository for'); ?>', '<?php echo htmlspecialchars($rowsGames['game'], ENT_QUOTES); ?>')">
-										<i class="icon-download-alt <?php echo formatIcon(); ?>"></i>
-									</a>
-<?php
-		}
-
-		if ( ($repoCacheInfo != FALSE) && ($repoCacheInfo['status'] != 'Aborted') && ($repoCacheInfo['status'] != 'Ready') ) {
-		// Operation in progress
-?>
-									<a class="btn btn-small" href="#" onclick="doRepoAction('<?php echo $boxid; ?>', '<?php echo $rowsGames['gameid']; ?>', 'abortOperation', '<?php echo T_('abort current operation for repository'); ?>', '<?php echo htmlspecialchars($rowsGames['game'], ENT_QUOTES); ?>')">
-										<i class="icon-stop <?php echo formatIcon(); ?>"></i>
-									</a>
-<?php
-		}
-
-		if ( $repoCacheInfo['status'] == 'Ready') {
-		// Cache Ready
-?>
-									<a class="btn btn-small" href="#" onclick="doRepoAction('<?php echo $boxid; ?>', '<?php echo $rowsGames['gameid']; ?>', 'makeRepo', '<?php echo T_('refresh repository contents for'); ?>', '<?php echo htmlspecialchars($rowsGames['game'], ENT_QUOTES); ?>')">
+									<a class="btn btn-small" href="#" onclick="">
 										<i class="icon-repeat <?php echo formatIcon(); ?>"></i>
 									</a>
-<?php
-		}
-
-	}
-
-?>
 								</div>
 							</td>
 							<td>
 								<!-- Drop Action -->
 								<div style="text-align: center;">
-<?php
-
-	if ($gameExists)
-	{
-		if ( ($repoCacheInfo != FALSE) && ( ($repoCacheInfo['status'] == 'Aborted') || ($repoCacheInfo['status'] == 'Ready') ) ) {
-		// Repo exists AND no operation in progress
-?>
-									<a class="btn btn-small" href="#" onclick="doRepoAction('<?php echo $boxid; ?>', '<?php echo $rowsGames['gameid']; ?>', 'deleteRepo', '<?php echo T_('remove cache repository for'); ?>', '<?php echo htmlspecialchars($rowsGames['game'], ENT_QUOTES); ?>')">
+									<a class="btn btn-small" href="#" onclick="">
 										<i class="icon-trash <?php echo formatIcon(); ?>"></i>
 									</a>
-<?php
-		}
-
-	}
-
-?>
 								</div>
 							</td>
 						</tr>
 <?php
 }
-
 ?>					</tbody>
 				</table>
 <?php
@@ -217,7 +117,6 @@ if (mysqli_num_rows($games) != 0)
 <?php
 }
 unset($games);
-
 ?>
 			</div>
 <?php

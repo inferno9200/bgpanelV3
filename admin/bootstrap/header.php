@@ -70,7 +70,7 @@ if (($page == 'scriptconsole') || ($page == 'utilitiesrcontool'))
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="#">Bright Game Panel</a>
+					<a class="brand" href="#"><?php echo htmlspecialchars(SITENAME, ENT_QUOTES); ?></a>
 <?php
 
 /**

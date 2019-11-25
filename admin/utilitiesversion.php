@@ -15,9 +15,10 @@ $title = T_('Version Check');
  * REMOTE VERSION RETRIEVER
  * Retrieve the last version of the panel from www.bgpanel.net
  */
-$request = "https://raw.githubusercontent.com/DopeProjects/bgpanelV3/master/.version/version.xml";
+$url = 'https://raw.githubusercontent.com/DopeProjects/bgpanelV3/master/.version/remote.json';
+$exo = file_get_contents($url);
+$data = json_decode($exo);
 
-$data = json_decode(file_get_contents($request));
 
 
 include("./bootstrap/header.php");
@@ -29,21 +30,21 @@ include("./bootstrap/header.php");
 include("./bootstrap/notifications.php");
 
 
-if ( (BRANCH != 'devel') && (version_compare(COREVERSION, $data->version) == -1) )
+if ( (BRANCH != 'devel') && (version_compare(COREVERSION, $data->VR) == -1) )
 {
 ?>
 			<div class="alert">
 				<strong><?php echo T_('Software Update Available!'); ?></strong>
-				<p><?php echo T_('It is strongly recommended that you apply this update to BrightGamePanel as soon as possible.'); ?></p>
+				<p><?php echo T_('It is strongly recommended that you apply this update to BrightGamePanelV3 as soon as possible.'); ?></p>
 			</div>
-			<div class="container"><div style="text-align: center;"><a class="btn btn-large btn-large btn-primary" type="button" href="http://sourceforge.net/projects/brightgamepanel/files/latest/download" target="_blank"><i class="icon-download-alt icon-white"></i>&nbsp;<?php echo T_('Download From SourceForge.net'); ?></a></div></div>
+			<div class="container"><div style="text-align: center;"><a class="btn btn-large btn-large btn-primary" type="button" href="https://github.com/DopeProjects/bgpanelV3" target="_blank"><i class="icon-download-alt icon-white"></i>&nbsp;<?php echo T_('Download From Github'); ?></a></div></div>
 <?php
 }
 else
 {
 ?>
 			<div class="alert alert-success">
-				<strong><?php echo T_('Your system is up-to-date!'); ?></strong>
+				<strong>Your system is up-to-date!</strong>
 			</div>
 <?php
 }
@@ -55,32 +56,32 @@ else
 					<div class="span6">
 						<legend><?php echo T_('Current Install'); ?></legend>
 						<form>
-							<label><?php echo T_('Project'); ?></label>
+							<label>Project</label>
 								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo PROJECT; ?>">
-							<label><?php echo T_('Package'); ?></label>
+							<label>Package</label>
 								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo PACKAGE; ?>">
-							<label><?php echo T_('Branch'); ?></label>
+							<label>Branch</label>
 								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo BRANCH; ?>">
-							<label><?php echo T_('Version'); ?></label>
+							<label>Version</label>
 								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo COREVERSION; ?>">
-							<label><?php echo T_('Release Date'); ?></label>
+							<label>Release Date</label>
 								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo RELEASEDATE; ?>">
 						</form>
 					</div>
 
 					<div class="span6">
-						<legend><?php echo T_('Remote Version (version.bgpanel.net)'); ?></legend>
+						<legend>Remote Version</legend>
 						<form>
-							<label><?php echo T_('Project'); ?></label>
-								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->project; ?>">
-							<label><?php echo T_('Package'); ?></label>
-								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->package; ?>">
-							<label><?php echo T_('Branch'); ?></label>
-								<input class="input-xlarge disabled" type="text" disabled="" placeholder="master">
-							<label><?php echo T_('Version'); ?></label>
-								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->version; ?>">
-							<label><?php echo T_('Release Date'); ?></label>
-								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->date; ?>">
+							<label>Project</label>
+								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->PR ?>">
+							<label>Package</label>
+								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->PA ?>">
+							<label>Branch</label>
+								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->BR ?>">
+							<label>Version</label>
+								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->VR ?>">
+							<label>Release Date</label>
+								<input class="input-xlarge disabled" type="text" disabled="" placeholder="<?php echo $data->RE ?>">
 						</form>
 					</div>
 				</div>

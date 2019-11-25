@@ -44,7 +44,7 @@ if (isClientLoggedIn() == FALSE) //Check if the user have wanted to access to a 
  */
 if (isClientLoggedIn() == TRUE)
 {
-	$clientverify = mysql_query( "SELECT `username`, `firstname`, `lastname`, `token`, `lastip` FROM `".DBPREFIX."client` WHERE `clientid` = '".$_SESSION['clientid']."' && `status` = 'Active'" );
+	$clientverify = mysqli_query( "SELECT `username`, `firstname`, `lastname`, `token`, `lastip` FROM `".DBPREFIX."client` WHERE `clientid` = '".$_SESSION['clientid']."' && `status` = 'Active'" );
 	###
 	$clientverify = mysql_fetch_assoc($clientverify);
 	if (

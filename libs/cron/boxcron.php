@@ -166,8 +166,8 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 			//---------------------------------------------------------+
 
 			// MEMORY INFO
-			$ram_used = intval(trim($ssh->exec("free -b | grep 'buffers/cache' | awk -F \":\" '{print $2}' | awk '{print $1}'")));
-			$ram_free = intval(trim($ssh->exec("free -b | grep 'buffers/cache' | awk -F \":\" '{print $2}' | awk '{print $2}'")));
+			$ram_used = intval(trim($ssh->exec("awk '/^Mem/ {print $3}' <(free -b)")));
+			$ram_free = intval(trim($ssh->exec("awk '/^Mem/ {print $7}' <(free -b)")));
 			$ram_total = $ram_used + $ram_free;
 			$ram_usage = round((($ram_used / $ram_total) * 100), 2);
 
@@ -180,7 +180,7 @@ if (query_numrows( "SELECT `boxid` FROM `".DBPREFIX."box` ORDER BY `boxid`" ) !=
 
 			// MISC INFO
 			$hostname = trim($ssh->exec('hostname'));
-			$os = trim($ssh->exec('uname -o'));
+			$os = trim($ssh->exec('hostnamectl | grep "Operating System" | sed "s/  Operating System: //"'));
 			$date = trim($ssh->exec('date'));
 			$kernel = trim($ssh->exec('uname -r'));
 			$arch = trim($ssh->exec('uname -m'));
