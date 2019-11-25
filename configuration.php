@@ -1,5 +1,10 @@
 <?php
 //*************************************************************************************************
+        if (is_dir("install"))
+        {
+	  header( "Location: /install" );
+	  die();
+        }
 	define('LICENSE', 'GNU GENERAL PUBLIC LICENSE - Version 3, 29 June 2007');
 	define('DBHOST', 'localhost');
 	define('DBNAME', 'bgpv3');
