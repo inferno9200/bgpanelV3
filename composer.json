@@ -1,0 +1,10 @@
+{
+    "require": {
+        "ext-bcmath": "*",
+        "ext-mbstring": "*",
+        "ext-memcached": "*",
+        "ext-xmlrpc": "*",
+		"ext-gd": "*",
+		"ext-mysqli": "*"
+    }
+}
