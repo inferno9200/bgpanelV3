@@ -1,10 +1,10 @@
 <?php
 //*************************************************************************************************
         define('LICENSE', 'GNU GENERAL PUBLIC LICENSE - Version 3, 29 June 2007');
-        define('DBHOST', 'localhost');
-        define('DBNAME', 'bgpv3');
-        define('DBUSER', 'root');
-        define('DBPASSWORD', 'admin');
+        define('DBHOST', 'sql139.main-hosting.eu');
+        define('DBNAME', 'u489082846_bgp');
+        define('DBUSER', 'u489082846_bgp');
+        define('DBPASSWORD', 'bgp123');
         define('DBPREFIX', 'bgpv3_');
         define('CRONDELAY', 600);
         date_default_timezone_set('Europe/London');
